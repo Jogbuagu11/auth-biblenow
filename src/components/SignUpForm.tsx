@@ -1,15 +1,15 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useApi } from '@/hooks/useApi';
-import { Eye, EyeOff, Mail, User, Calendar, Check } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Calendar, Check, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 // Multi-step signup form steps
 enum SignUpStep {
