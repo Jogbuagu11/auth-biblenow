@@ -8,8 +8,20 @@ const Footer = () => {
   return (
     <footer className="mt-auto py-8 px-4 bg-biblenow-brown border-t border-biblenow-gold/20">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Column 1 - Navigation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Column 1 - Logo */}
+          <div className="space-y-4">
+            <img 
+              src="/lovable-uploads/0fb57340-3877-426f-9098-3a62d10a1114.png" 
+              alt="BibleNOW Logo" 
+              className="h-16 mb-4"
+            />
+            <p className="text-biblenow-beige/70 text-sm">
+              Experience the Bible in a new way with BibleNOW - where Scripture comes alive through modern technology.
+            </p>
+          </div>
+          
+          {/* Column 2 - Navigation */}
           <div className="space-y-4">
             <h3 className="text-biblenow-gold font-serif text-xl mb-4">BibleNOW</h3>
             <ul className="space-y-2">
@@ -21,7 +33,7 @@ const Footer = () => {
             </ul>
           </div>
           
-          {/* Column 2 - Resources */}
+          {/* Column 3 - Resources */}
           <div className="space-y-4">
             <h3 className="text-biblenow-gold font-serif text-xl mb-4">Resources</h3>
             <ul className="space-y-2">
@@ -33,7 +45,7 @@ const Footer = () => {
             </ul>
           </div>
           
-          {/* Column 3 - Legal & Connect */}
+          {/* Column 4 - Legal & Connect */}
           <div className="space-y-4">
             <h3 className="text-biblenow-gold font-serif text-xl mb-4">Connect</h3>
             <ul className="space-y-2 mb-6">

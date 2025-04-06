@@ -119,8 +119,8 @@ export const useAuth = () => {
         return false;
       }
       
-      toast({
-        title: 'Account created',
+      // Fixed this line: use the toast function correctly
+      toast('Account created', {
         description: 'Please check your email to confirm your account',
       });
       
