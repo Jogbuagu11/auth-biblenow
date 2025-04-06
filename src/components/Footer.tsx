@@ -35,7 +35,7 @@ const Footer = () => {
           <div className="space-y-4">
             <ul className="space-y-2">
               <li><Link to="https://about.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">About Us</Link></li>
-              <li><Link to="mailto:contact@biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Contact</Link></li>
+              <li><Link to="https://contact.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Contact</Link></li>
               <li><Link to="https://donate.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Support Our Mission</Link></li>
               <li><Link to="https://faq.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">FAQ</Link></li>
             </ul>
@@ -46,7 +46,6 @@ const Footer = () => {
             <ul className="space-y-2 mb-6">
               <li><Link to="https://policy.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Privacy Policy</Link></li>
               <li><Link to="https://terms.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Terms of Service</Link></li>
-              <li><Link to="https://biblenow.io/copyright" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Copyright Information</Link></li>
             </ul>
             <div className="flex space-x-4">
               <a href="https://facebook.com/biblenow" aria-label="Facebook" className="text-biblenow-gold hover:text-biblenow-gold-light">

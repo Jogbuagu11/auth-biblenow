@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 
 // Multi-step signup form steps
@@ -30,6 +31,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [birthdate, setBirthdate] = useState<Date | undefined>(undefined);
+  const [birthDateString, setBirthDateString] = useState('');
   const [gender, setGender] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [ageVerified, setAgeVerified] = useState(false);
@@ -55,6 +57,28 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const { toast } = useToast();
   
   const redirectTo = new URLSearchParams(location.search).get('redirectTo');
+
+  // Handler for processing the birthdate input
+  const handleBirthdateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setBirthDateString(value);
+    
+    // Try to parse the date
+    try {
+      if (value) {
+        const parsedDate = parse(value, 'yyyy-MM-dd', new Date());
+        if (!isNaN(parsedDate.getTime())) {
+          setBirthdate(parsedDate);
+        } else {
+          setBirthdate(undefined);
+        }
+      } else {
+        setBirthdate(undefined);
+      }
+    } catch (err) {
+      setBirthdate(undefined);
+    }
+  };
 
   // Handler for Google signup
   const handleGoogleSignUp = async () => {
@@ -397,31 +421,25 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       </div>
       
       <div>
-        <label className="block text-sm font-medium text-biblenow-beige mb-1">
+        <label htmlFor="birthdate" className="block text-sm font-medium text-biblenow-beige mb-1">
           Date of Birth
         </label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              className={`auth-input w-full flex justify-between items-center ${!birthdate ? 'text-biblenow-beige/40' : 'text-biblenow-beige'}`}
-            >
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 mr-2 text-biblenow-beige/40" />
-                {birthdate ? format(birthdate, 'PPP') : 'Select your date of birth'}
-              </div>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="p-0 bg-biblenow-brown-light border-biblenow-gold/30">
-            <CalendarComponent
-              mode="single"
-              selected={birthdate}
-              onSelect={setBirthdate}
-              disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Calendar className="h-5 w-5 text-biblenow-beige/40" />
+          </div>
+          <input
+            id="birthdate"
+            name="birthdate"
+            type="date"
+            required
+            value={birthDateString}
+            onChange={handleBirthdateChange}
+            className="auth-input pl-10"
+            max={new Date().toISOString().split('T')[0]}
+            min="1900-01-01"
+          />
+        </div>
       </div>
       
       <div>
