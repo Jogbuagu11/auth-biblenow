@@ -75,3 +75,9 @@
     @apply bg-biblenow-brown-light/80 backdrop-blur-sm border border-biblenow-gold/20 rounded-lg shadow-xl p-6 md:p-8;
   }
 }
+
+@layer utilities {
+  .bg-biblenow-brown-dark {
+    background-color: #1d1914;
+  }
+}

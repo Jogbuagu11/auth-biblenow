@@ -6,7 +6,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="mt-auto py-8 px-4 bg-biblenow-brown border-t border-biblenow-gold/20">
+    <footer className="mt-auto py-8 px-4 bg-biblenow-brown-dark border-t border-biblenow-gold/20">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Column 1 - Logo */}
@@ -17,7 +17,7 @@ const Footer = () => {
               className="h-16 mb-4"
             />
             <p className="text-biblenow-beige/70 text-sm">
-              Experience scripture online like never before.
+              Experience Scripture Online Like Never Before.
             </p>
           </div>
           
