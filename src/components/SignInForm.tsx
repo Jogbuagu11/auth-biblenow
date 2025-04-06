@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';

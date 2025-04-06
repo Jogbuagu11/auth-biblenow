@@ -307,11 +307,13 @@ export type Database = {
           birthdate: string | null
           created_at: string | null
           email: string | null
+          first_name: string | null
           gender: string | null
           has_completed_2fa: boolean | null
           has_completed_profile: boolean | null
           id: string
           is_verified: boolean | null
+          last_name: string | null
           location: string | null
           name: string | null
           phone: string | null
@@ -328,11 +330,13 @@ export type Database = {
           birthdate?: string | null
           created_at?: string | null
           email?: string | null
+          first_name?: string | null
           gender?: string | null
           has_completed_2fa?: boolean | null
           has_completed_profile?: boolean | null
           id: string
           is_verified?: boolean | null
+          last_name?: string | null
           location?: string | null
           name?: string | null
           phone?: string | null
@@ -349,11 +353,13 @@ export type Database = {
           birthdate?: string | null
           created_at?: string | null
           email?: string | null
+          first_name?: string | null
           gender?: string | null
           has_completed_2fa?: boolean | null
           has_completed_profile?: boolean | null
           id?: string
           is_verified?: boolean | null
+          last_name?: string | null
           location?: string | null
           name?: string | null
           phone?: string | null
