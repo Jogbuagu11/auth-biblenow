@@ -1,30 +1,34 @@
 
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import Footer from "@/components/Footer";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const NotFound = () => {
-  const location = useLocation();
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
-  }, [location.pathname]);
-
+    // Redirect to login page after a short delay
+    const timer = setTimeout(() => {
+      navigate('/login');
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, [navigate]);
+  
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-grow flex items-center justify-center">
-        <div className="text-center px-4 py-12">
-          <h1 className="text-4xl font-serif font-bold text-biblenow-gold mb-4">404</h1>
-          <p className="text-xl text-biblenow-beige mb-4">Oops! Page not found</p>
-          <a href="/" className="auth-link">
-            Return to Home
-          </a>
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-biblenow-brown">
+      <div className="auth-card w-full max-w-md p-6">
+        <h1 className="text-3xl font-serif font-semibold text-biblenow-gold mb-4">404</h1>
+        <h2 className="text-2xl font-serif font-semibold text-biblenow-beige mb-6">Page Not Found</h2>
+        <p className="text-biblenow-beige/60 mb-8">
+          The page you're looking for doesn't exist. You'll be redirected to the login page shortly.
+        </p>
+        <button
+          onClick={() => navigate('/login')}
+          className="auth-btn-primary w-full"
+        >
+          Go to Login
+        </button>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import CallbackHandler from "./components/auth/CallbackHandler";
 
 const queryClient = new QueryClient();
 
@@ -16,8 +17,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Auth />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Auth />} />
+          <Route path="/auth/callback" element={<CallbackHandler />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
