@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface SignUpFormProps {
   onToggleForm: () => void;
@@ -15,6 +16,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [ageVerified, setAgeVerified] = useState(false);
   const { loading, error, signUp, setError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,6 +39,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     
     if (!agreedToTerms) {
       setError({ message: 'Please agree to the terms and conditions' });
+      return;
+    }
+    
+    if (!ageVerified) {
+      setError({ message: 'You must be at least 13 years of age to create an account' });
       return;
     }
     
@@ -146,22 +153,32 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           </div>
         </div>
         
-        <div className="flex items-center">
-          <input
-            id="terms"
-            name="terms"
-            type="checkbox"
-            checked={agreedToTerms}
-            onChange={(e) => setAgreedToTerms(e.target.checked)}
-            className="h-4 w-4 rounded border-biblenow-gold/30 bg-transparent text-biblenow-gold focus:ring-biblenow-gold/20"
+        <div className="flex items-start space-x-2">
+          <Checkbox
+            id="ageVerification"
+            checked={ageVerified}
+            onCheckedChange={(checked) => setAgeVerified(checked === true)}
+            className="mt-1"
           />
-          <label htmlFor="terms" className="ml-2 block text-sm text-biblenow-beige/70">
+          <label htmlFor="ageVerification" className="text-sm text-biblenow-beige/70 cursor-pointer">
+            I am at least 13 years of age
+          </label>
+        </div>
+        
+        <div className="flex items-start space-x-2">
+          <Checkbox
+            id="terms"
+            checked={agreedToTerms}
+            onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+            className="mt-1"
+          />
+          <label htmlFor="terms" className="text-sm text-biblenow-beige/70 cursor-pointer">
             I agree to the{' '}
-            <a href="#" className="auth-link">
+            <a href="https://terms.biblenow.io" className="auth-link">
               Terms of Service
             </a>{' '}
             and{' '}
-            <a href="#" className="auth-link">
+            <a href="https://policy.biblenow.io" className="auth-link">
               Privacy Policy
             </a>
           </label>
