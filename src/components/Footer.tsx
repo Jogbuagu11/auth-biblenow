@@ -17,40 +17,35 @@ const Footer = () => {
               className="h-16 mb-4"
             />
             <p className="text-biblenow-beige/70 text-sm">
-              Experience the Bible in a new way with BibleNOW - where Scripture comes alive through modern technology.
+              Experience scripture online like never before.
             </p>
           </div>
           
           {/* Column 2 - Navigation */}
           <div className="space-y-4">
-            <h3 className="text-biblenow-gold font-serif text-xl mb-4">BibleNOW</h3>
             <ul className="space-y-2">
-              <li><Link to="https://biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Home</Link></li>
               <li><Link to="https://read.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Read</Link></li>
               <li><Link to="https://live.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Live</Link></li>
               <li><Link to="https://learn.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Learn</Link></li>
-              <li><Link to="https://social.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Community</Link></li>
+              <li><Link to="https://social.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Social</Link></li>
             </ul>
           </div>
           
           {/* Column 3 - Resources */}
           <div className="space-y-4">
-            <h3 className="text-biblenow-gold font-serif text-xl mb-4">Resources</h3>
             <ul className="space-y-2">
-              <li><Link to="https://biblenow.io/about" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">About Us</Link></li>
-              <li><Link to="https://biblenow.io/contact" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Contact</Link></li>
-              <li><Link to="https://biblenow.io/donate" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Support Our Mission</Link></li>
-              <li><Link to="https://biblenow.io/faq" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">FAQ</Link></li>
-              <li><Link to="https://biblenow.io/blog" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Blog</Link></li>
+              <li><Link to="https://about.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">About Us</Link></li>
+              <li><Link to="mailto:contact@biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Contact</Link></li>
+              <li><Link to="https://donate.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Support Our Mission</Link></li>
+              <li><Link to="https://faq.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">FAQ</Link></li>
             </ul>
           </div>
           
           {/* Column 4 - Legal & Connect */}
           <div className="space-y-4">
-            <h3 className="text-biblenow-gold font-serif text-xl mb-4">Connect</h3>
             <ul className="space-y-2 mb-6">
-              <li><Link to="https://biblenow.io/privacy-policy" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Privacy Policy</Link></li>
-              <li><Link to="https://biblenow.io/terms-of-service" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Terms of Service</Link></li>
+              <li><Link to="https://policy.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Privacy Policy</Link></li>
+              <li><Link to="https://terms.biblenow.io" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Terms of Service</Link></li>
               <li><Link to="https://biblenow.io/copyright" className="text-biblenow-beige/70 hover:text-biblenow-gold transition-colors">Copyright Information</Link></li>
             </ul>
             <div className="flex space-x-4">
