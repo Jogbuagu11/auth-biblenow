@@ -40,9 +40,9 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       return;
     }
     
-    const result = await signUp(email, password);
+    const success = await signUp(email, password);
     
-    if (result) {
+    if (success) {
       toast({
         title: "Account created!",
         description: "Check your email to confirm your account.",

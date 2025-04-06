@@ -29,9 +29,9 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       return;
     }
     
-    const result = await signIn(email, password);
+    const success = await signIn(email, password);
     
-    if (result) {
+    if (success) {
       toast({
         title: "Success!",
         description: "You've been signed in.",
