@@ -1,129 +1,130 @@
 
-import { useState, useEffect } from 'react';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
+import { createClient, Session, User } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 
-// Note: In a production environment, these would be environment variables
-// For this demo, we're embedding them directly
-const supabaseUrl = 'https://your-supabase-url.supabase.co';
-const supabaseAnonKey = 'your-supabase-anon-key';
+// Create a Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-const COOKIE_OPTIONS = {
-  domain: '.biblenow.io',
-  path: '/',
-  sameSite: 'lax' as const,
-};
+// Cookie domain should be .biblenow.io in production
+const cookieDomain = window.location.hostname.includes('biblenow.io') 
+  ? '.biblenow.io' 
+  : window.location.hostname;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    persistSession: false, // Don't persist to localStorage
-    autoRefreshToken: true,
-    storageKey: 'biblenow-auth',
-    cookieOptions: COOKIE_OPTIONS,
+    persistSession: true,
+    // Important: For cookie-based auth, we need to set storage to 'cookie'
+    storage: {
+      getItem: (key) => document.cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() || '',
+      setItem: (key, value) => {
+        document.cookie = `${key}=${value}; domain=${cookieDomain}; path=/; max-age=2592000; SameSite=Lax; secure`;
+      },
+      removeItem: (key) => {
+        document.cookie = `${key}=; domain=${cookieDomain}; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; secure`;
+      },
+    },
+    detectSessionInUrl: true,
   }
 });
 
-export type AuthError = {
-  message: string;
+// Function to extract redirectTo from URL
+const getRedirectTo = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('redirectTo') || '';
 };
 
 export const useAuth = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<AuthError | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   
-  // Clear any errors when component unmounts
-  useEffect(() => {
-    return () => setError(null);
-  }, []);
-
+  // Handle redirect after login/signup
+  const handleRedirect = () => {
+    const redirectTo = getRedirectTo();
+    if (redirectTo) {
+      // If it's a relative URL or a biblenow.io subdomain, redirect
+      if (redirectTo.startsWith('/') || 
+          redirectTo.includes('.biblenow.io') || 
+          redirectTo === 'biblenow.io') {
+        window.location.href = decodeURIComponent(redirectTo);
+      }
+    }
+  };
+  
+  // Function to sign in
   const signIn = async (email: string, password: string) => {
     setLoading(true);
-    setError(null);
-    
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      if (error) {
-        throw error;
-      }
-      
-      return data;
-    } catch (err: any) {
-      setError({
-        message: err.message || 'Failed to sign in. Please try again.',
-      });
-      return null;
+      if (error) throw error;
+      handleRedirect();
+    } catch (error: any) {
+      console.error('Error signing in:', error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
-
+  
+  // Function to sign up
   const signUp = async (email: string, password: string) => {
     setLoading(true);
-    setError(null);
-    
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
       });
       
-      if (error) {
-        throw error;
-      }
-      
-      return data;
-    } catch (err: any) {
-      setError({
-        message: err.message || 'Failed to sign up. Please try again.',
-      });
-      return null;
+      if (error) throw error;
+      handleRedirect();
+    } catch (error: any) {
+      console.error('Error signing up:', error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
-
+  
+  // Function to sign out
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-    } catch (err: any) {
-      console.error('Error signing out:', err);
+      navigate('/login');
+    } catch (error: any) {
+      console.error('Error signing out:', error.message);
     }
   };
-
-  const resetPassword = async (email: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/reset-password',
-      });
-      
-      if (error) {
-        throw error;
+  
+  // Listen for auth changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        setLoading(false);
       }
-      
-      return true;
-    } catch (err: any) {
-      setError({
-        message: err.message || 'Failed to reset password. Please try again.',
-      });
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    );
+    
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+  
   return {
+    session,
+    user,
     loading,
-    error,
     signIn,
     signUp,
     signOut,
-    resetPassword,
-    setError,
   };
 };
+
+export default useAuth;
