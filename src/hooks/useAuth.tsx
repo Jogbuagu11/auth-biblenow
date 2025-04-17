@@ -1,42 +1,9 @@
 
 import { useEffect, useState } from 'react';
-import { createClient, Session, User } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
-// Get Supabase credentials from environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Check if environment variables are available
-if (!supabaseUrl || !supabaseKey) {
-  console.error('Supabase environment variables are missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
-}
-
-// Cookie domain should be .biblenow.io in production
-const cookieDomain = window.location.hostname.includes('biblenow.io') 
-  ? '.biblenow.io' 
-  : window.location.hostname;
-
-// Only create the client if we have the required values
-const supabase = supabaseUrl && supabaseKey 
-  ? createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: true,
-        // Important: For cookie-based auth, we need to set storage to 'cookie'
-        storage: {
-          getItem: (key) => document.cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() || '',
-          setItem: (key, value) => {
-            document.cookie = `${key}=${value}; domain=${cookieDomain}; path=/; max-age=2592000; SameSite=Lax; secure`;
-          },
-          removeItem: (key) => {
-            document.cookie = `${key}=; domain=${cookieDomain}; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; secure`;
-          },
-        },
-        detectSessionInUrl: true,
-      }
-    })
-  : null;
+import { supabase } from '@/integrations/supabase/client';
 
 // Function to extract redirectTo from URL
 const getRedirectTo = () => {
@@ -69,12 +36,6 @@ export const useAuth = () => {
     setLoading(true);
     setError(null);
     
-    if (!supabase) {
-      setError({ message: 'Supabase client is not initialized. Check your environment variables.' });
-      setLoading(false);
-      return false;
-    }
-    
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -102,14 +63,8 @@ export const useAuth = () => {
     setLoading(true);
     setError(null);
     
-    if (!supabase) {
-      setError({ message: 'Supabase client is not initialized. Check your environment variables.' });
-      setLoading(false);
-      return false;
-    }
-    
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -118,6 +73,8 @@ export const useAuth = () => {
         setError({ message: signUpError.message });
         return false;
       }
+      
+      console.log("Sign up response:", data);
       
       // Fixed this line: use the toast function correctly
       toast('Account created', {
@@ -137,11 +94,6 @@ export const useAuth = () => {
   
   // Function to sign out
   const signOut = async () => {
-    if (!supabase) {
-      setError({ message: 'Supabase client is not initialized. Check your environment variables.' });
-      return;
-    }
-    
     try {
       await supabase.auth.signOut();
       navigate('/login');
@@ -153,18 +105,23 @@ export const useAuth = () => {
   
   // Listen for auth changes
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-    
+    // First set up the auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
+        console.log("Auth state changed, new session:", newSession);
         setSession(newSession);
         setUser(newSession?.user ?? null);
         setLoading(false);
       }
     );
+    
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Current session on init:", currentSession);
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setLoading(false);
+    });
     
     return () => {
       subscription.unsubscribe();

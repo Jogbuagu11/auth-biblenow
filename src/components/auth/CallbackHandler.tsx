@@ -18,10 +18,15 @@ const CallbackHandler = () => {
           throw new Error('No code provided in callback URL');
         }
         
+        console.log("Auth callback received with code, exchanging for session...");
+        
         // Exchange the code for a session
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        
+        console.log("Exchange code response:", { data, error });
         
         if (error) {
+          console.error("Error exchanging code for session:", error);
           throw error;
         }
         
@@ -29,9 +34,11 @@ const CallbackHandler = () => {
         const redirectTo = searchParams.get('redirectTo');
         
         if (redirectTo) {
+          console.log("Redirecting to:", decodeURIComponent(redirectTo));
           window.location.href = decodeURIComponent(redirectTo);
         } else {
           // Navigate to the home page if no redirect is specified
+          console.log("No redirect specified, going to default location");
           window.location.href = 'https://social.biblenow.io/create-profile';
         }
       } catch (error: any) {

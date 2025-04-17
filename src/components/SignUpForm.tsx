@@ -1,14 +1,11 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useApi } from '@/hooks/useApi';
-import { Eye, EyeOff, Mail, User, Calendar, Check, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format, parse } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -83,6 +80,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   // Handler for Google signup
   const handleGoogleSignUp = async () => {
     try {
+      console.log("Starting Google sign up...");
+      
       // You need to have configured Google Auth in your Supabase project
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -93,7 +92,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         },
       });
       
+      console.log("Google sign up response:", { data, error });
+      
       if (error) {
+        console.error("Google sign up error:", error);
         setError({ message: error.message });
       }
     } catch (err: any) {
@@ -105,6 +107,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   // Handler for Apple signup
   const handleAppleSignUp = async () => {
     try {
+      console.log("Starting Apple sign up...");
+      
       // You need to have configured Apple Auth in your Supabase project
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
@@ -115,7 +119,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         },
       });
       
+      console.log("Apple sign up response:", { data, error });
+      
       if (error) {
+        console.error("Apple sign up error:", error);
         setError({ message: error.message });
       }
     } catch (err: any) {
@@ -217,23 +224,37 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
     
     try {
-      // Create Supabase user with metadata
-      const metadata = {
-        first_name: firstName,
-        last_name: lastName,
-        birthdate: birthdate ? format(birthdate, 'yyyy-MM-dd') : null,
-        gender,
-      };
+      console.log("Creating Supabase user with email/password:", { email, firstName, lastName, birthdate, gender });
       
-      const response = await api.createUserWithMetadata(email, password, metadata);
+      // Create Supabase user directly
+      const { data: userData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            birthdate: birthdate ? format(birthdate, 'yyyy-MM-dd') : null,
+            gender,
+          }
+        }
+      });
       
-      if (response.error) {
-        setError({ message: response.error });
+      console.log("Supabase signup response:", { userData, signUpError });
+      
+      if (signUpError) {
+        console.error("Error creating user in Supabase:", signUpError);
+        setError({ message: signUpError.message });
+        return;
+      }
+      
+      if (!userData.user) {
+        setError({ message: 'Failed to create user account. Please try again.' });
         return;
       }
       
       // Store the user ID for later use
-      setUserId(response.data?.user?.id || null);
+      setUserId(userData.user.id);
       
       // Move to 2FA setup step
       setCurrentStep(SignUpStep.SETUP_2FA);
@@ -435,7 +456,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
             required
             value={birthDateString}
             onChange={handleBirthdateChange}
-            className="auth-input pl-10"
+            className="auth-input"
             max={new Date().toISOString().split('T')[0]}
             min="1900-01-01"
           />
