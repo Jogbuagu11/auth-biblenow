@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useApi } from '@/hooks/useApi';
-import { Eye, EyeOff, Mail, User, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Lock, Calendar } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { format, parse } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 
-// Multi-step signup form steps
 enum SignUpStep {
   INITIAL_INFO,
   VERIFY_EMAIL,
@@ -23,7 +22,6 @@ interface SignUpFormProps {
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
-  // Form data
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -33,7 +31,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [ageVerified, setAgeVerified] = useState(false);
   
-  // Email verification
   const [verificationCode, setVerificationCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -43,7 +40,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [twoFACode, setTwoFACode] = useState('');
   const [expectedTwoFACode, setExpectedTwoFACode] = useState('');
   
-  // State management
   const [currentStep, setCurrentStep] = useState<SignUpStep>(SignUpStep.INITIAL_INFO);
   const [userId, setUserId] = useState<string | null>(null);
   
@@ -55,12 +51,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   
   const redirectTo = new URLSearchParams(location.search).get('redirectTo');
 
-  // Handler for processing the birthdate input
   const handleBirthdateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setBirthDateString(value);
     
-    // Try to parse the date
     try {
       if (value) {
         const parsedDate = parse(value, 'yyyy-MM-dd', new Date());
@@ -77,12 +71,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Handler for Google signup
   const handleGoogleSignUp = async () => {
     try {
       console.log("Starting Google sign up...");
       
-      // You need to have configured Google Auth in your Supabase project
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -104,12 +96,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Handler for Apple signup
   const handleAppleSignUp = async () => {
     try {
       console.log("Starting Apple sign up...");
       
-      // You need to have configured Apple Auth in your Supabase project
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
@@ -131,11 +121,9 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Step 1: Initial form submission
   const handleInitialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
     if (!firstName || !lastName || !email || !birthdate || !gender) {
       setError({ message: 'Please fill in all required fields' });
       return;
@@ -152,7 +140,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
     
     try {
-      // Send verification code to email
       const response = await api.sendVerificationCode(email);
       
       if (response.error) {
@@ -160,7 +147,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         return;
       }
       
-      // Move to verification step
       setCurrentStep(SignUpStep.VERIFY_EMAIL);
       toast({
         title: "Verification code sent",
@@ -172,7 +158,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Step 2: Verify email
   const handleVerifyEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -204,7 +189,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Step 3: Set password
   const handleSetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -226,7 +210,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     try {
       console.log("Creating Supabase user with email/password:", { email, firstName, lastName, birthdate, gender });
       
-      // Create Supabase user directly
       const { data: userData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -253,10 +236,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         return;
       }
       
-      // Store the user ID for later use
       setUserId(userData.user.id);
       
-      // Move to 2FA setup step
       setCurrentStep(SignUpStep.SETUP_2FA);
       toast({
         title: "Account created",
@@ -268,12 +249,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Step 4: Setup 2FA decision
   const handleSetup2FA = async (enable: boolean) => {
     setEnable2FA(enable);
     
     if (!enable) {
-      // Skip 2FA
       if (userId) {
         try {
           const response = await api.skip2FA(userId);
@@ -283,7 +262,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
             return;
           }
           
-          // Redirect to profile creation
           if (redirectTo) {
             window.location.href = decodeURIComponent(redirectTo);
           } else {
@@ -297,7 +275,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Step 4b: Send 2FA code
   const handleSend2FACode = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -319,10 +296,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         return;
       }
       
-      // Store the expected code
       setExpectedTwoFACode(response.data?.verification_code || '');
       
-      // Move to 2FA verification step
       setCurrentStep(SignUpStep.VERIFY_2FA);
       toast({
         title: "Verification code sent",
@@ -334,7 +309,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Step 5: Verify 2FA
   const handleVerify2FA = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -362,7 +336,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           description: "Your phone number has been verified successfully",
         });
         
-        // Redirect to profile creation
         if (redirectTo) {
           window.location.href = decodeURIComponent(redirectTo);
         } else {
@@ -377,7 +350,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     }
   };
 
-  // Render step 1: Initial information form
   const renderInitialForm = () => (
     <form onSubmit={handleInitialSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -456,7 +428,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
             required
             value={birthDateString}
             onChange={handleBirthdateChange}
-            className="auth-input"
+            className="auth-input pl-10"
             max={new Date().toISOString().split('T')[0]}
             min="1900-01-01"
           />
@@ -563,7 +535,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     </form>
   );
 
-  // Render step 2: Email verification
   const renderVerifyEmailForm = () => (
     <form onSubmit={handleVerifyEmail} className="space-y-6">
       <div className="text-center">
@@ -627,7 +598,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     </form>
   );
 
-  // Render step 3: Set password
   const renderSetPasswordForm = () => (
     <form onSubmit={handleSetPassword} className="space-y-6">
       <div className="text-center">
@@ -710,7 +680,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     </form>
   );
 
-  // Render step 4: Setup 2FA
   const renderSetup2FAForm = () => (
     <div className="space-y-6">
       <div className="text-center">
@@ -787,7 +756,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     </div>
   );
 
-  // Render step 5: Verify 2FA
   const renderVerify2FAForm = () => (
     <form onSubmit={handleVerify2FA} className="space-y-6">
       <div className="text-center">
