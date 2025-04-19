@@ -12,6 +12,17 @@ const AuthCallback = () => {
       const redirectTo = new URLSearchParams(window.location.search).get('redirectTo');
 
       if (data.session) {
+        // Check if 2FA has been enabled or skipped
+        const twoFaEnabled = data.session.user?.user_metadata?.twofa_enabled;
+        const twoFaSkipped = data.session.user?.user_metadata?.twofa_skipped;
+        
+        // If 2FA hasn't been set up or skipped, redirect to 2FA prompt
+        if (!twoFaEnabled && !twoFaSkipped) {
+          navigate('/auth/two-factor-prompt');
+          return;
+        }
+        
+        // Otherwise, proceed with normal redirect
         window.location.href = redirectTo || 'https://social.biblenow.io/edit-testimony';
       } else {
         navigate('/auth'); // fallback if session fails

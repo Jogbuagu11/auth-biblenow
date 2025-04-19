@@ -1,12 +1,19 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { User, Session } from '@supabase/supabase-js';
 
-<<<<<<< HEAD
+interface AuthError {
+  message: string;
+}
+
 export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{message: string} | null>(null);
+  const [error, setError] = useState<AuthError | null>(null);
   const navigate = useNavigate();
   
   // Function to sign in
@@ -89,18 +96,6 @@ export const useAuth = () => {
   };
   
   // Listen for auth changes
-=======
-interface AuthError {
-  message: string;
-}
-
-export const useAuth = () => {
-  const [user, setUser] = useState<any>(null);
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<AuthError | null>(null);
-
->>>>>>> 4e08369 (Refactor auth flow: removed useAuth from SignInForm, added ResetPasswordModal, cleaned up signup/login components)
   useEffect(() => {
     const fetchSession = async () => {
       try {
@@ -140,5 +135,8 @@ export const useAuth = () => {
     loading,
     error,
     setError,
+    signIn,
+    signUp,
+    signOut,
   };
 };
