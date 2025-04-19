@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,8 +39,18 @@ const CallbackHandler = () => {
           
         console.log("Profile data:", profileData);
         
+<<<<<<< HEAD
         if (profileError && profileError.code !== 'PGRST116') {
           console.error("Error fetching profile:", profileError);
+=======
+        if (redirectTo) {
+          console.log("Redirecting to:", decodeURIComponent(redirectTo));
+          window.location.href = decodeURIComponent(redirectTo);
+        } else {
+          // Navigate to the home page if no redirect is specified
+          console.log("No redirect specified, going to default location");
+          window.location.href = 'https://social.biblenow.io/edit-testimony';
+>>>>>>> 4e08369 (Refactor auth flow: removed useAuth from SignInForm, added ResetPasswordModal, cleaned up signup/login components)
         }
         
         // Check if 2FA has been enabled or skipped in user metadata

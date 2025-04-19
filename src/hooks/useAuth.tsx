@@ -1,10 +1,7 @@
-
 import { useEffect, useState } from 'react';
-import { Session, User } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
+<<<<<<< HEAD
 export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -92,40 +89,56 @@ export const useAuth = () => {
   };
   
   // Listen for auth changes
+=======
+interface AuthError {
+  message: string;
+}
+
+export const useAuth = () => {
+  const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<AuthError | null>(null);
+
+>>>>>>> 4e08369 (Refactor auth flow: removed useAuth from SignInForm, added ResetPasswordModal, cleaned up signup/login components)
   useEffect(() => {
-    // First set up the auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
-        console.log("Auth state changed, new session:", newSession);
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
+    const fetchSession = async () => {
+      try {
+        const {
+          data: { session },
+          error
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          setError({ message: error.message });
+        } else {
+          setSession(session);
+          setUser(session?.user || null);
+        }
+      } catch (err: any) {
+        setError({ message: err.message || 'Unexpected error' });
+      } finally {
         setLoading(false);
       }
-    );
-    
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      console.log("Current session on init:", currentSession);
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setLoading(false);
+    };
+
+    fetchSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user || null);
     });
-    
+
     return () => {
-      subscription.unsubscribe();
+      listener.subscription.unsubscribe();
     };
   }, []);
-  
+
   return {
-    session,
     user,
+    session,
     loading,
     error,
     setError,
-    signIn,
-    signUp,
-    signOut,
   };
 };
-
-export default useAuth;
