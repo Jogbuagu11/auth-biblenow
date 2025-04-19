@@ -43,7 +43,7 @@ export const useAuth = () => {
   };
   
   // Function to sign up
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, metadata?: Record<string, any>) => {
     setLoading(true);
     setError(null);
     
@@ -53,6 +53,10 @@ export const useAuth = () => {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: metadata || {},
+          emailRedirectTo: 'https://auth.biblenow.io/auth/callback'
+        },
       });
       
       console.log("Sign up response:", data);
@@ -62,7 +66,6 @@ export const useAuth = () => {
         return false;
       }
       
-      // Fixed this line: use the toast function correctly
       toast('Account created', {
         description: 'Please check your email to confirm your account',
       });

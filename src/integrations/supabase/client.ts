@@ -7,6 +7,7 @@ const SUPABASE_URL = "https://jhlawjmyorpmafokxtuh.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpobGF3am15b3JwbWFmb2t4dHVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MzI5MjYsImV4cCI6MjA1ODUwODkyNn0.qwGsvKP5P2kwMT9qkEA0ZxjAVUM-RIf9Do9xiPMikX4";
 
 // Cookie domain should be .biblenow.io in production
+// This allows auth sharing across subdomains (auth.biblenow.io and social.biblenow.io)
 const cookieDomain = window.location.hostname.includes('biblenow.io') 
   ? '.biblenow.io' 
   : window.location.hostname;

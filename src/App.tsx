@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import CallbackHandler from "./components/auth/CallbackHandler";
+import TwoFactorPrompt from "./components/auth/TwoFactorPrompt";
+import TwoFactorSetup from "./components/auth/TwoFactorSetup";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/auth/callback" element={<CallbackHandler />} />
+          <Route path="/auth/two-factor-prompt" element={<TwoFactorPrompt />} />
+          <Route path="/auth/setup-2fa" element={<TwoFactorSetup />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

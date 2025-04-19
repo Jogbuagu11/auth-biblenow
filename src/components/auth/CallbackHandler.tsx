@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const CallbackHandler = () => {
   const [searchParams] = useSearchParams();
@@ -30,7 +31,7 @@ const CallbackHandler = () => {
           throw error;
         }
         
-        // Check if this is a new user that needs to complete profile setup
+        // Check if the user has completed their profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('has_completed_profile')
@@ -39,19 +40,31 @@ const CallbackHandler = () => {
           
         console.log("Profile data:", profileData);
         
-        if (profileError) {
+        if (profileError && profileError.code !== 'PGRST116') {
           console.error("Error fetching profile:", profileError);
+        }
+        
+        // Check if 2FA has been enabled or skipped in user metadata
+        const twoFaEnabled = data.session.user.user_metadata?.twofa_enabled;
+        const twoFaSkipped = data.session.user.user_metadata?.twofa_skipped;
+        
+        // If the user hasn't set up or skipped 2FA, redirect to the 2FA prompt
+        if (!twoFaEnabled && !twoFaSkipped) {
+          navigate('/auth/two-factor-prompt');
+          return;
         }
         
         // Determine if this is a new user that needs to complete profile
         const needsProfileSetup = !profileData?.has_completed_profile;
         
-        // For now, redirect all users to edit-testimony to set up their profile
-        // This matches the requirement to send all users there
+        // Redirect to social.biblenow.io to complete profile setup
         window.location.href = 'https://social.biblenow.io/edit-testimony';
       } catch (error: any) {
         console.error('Error handling auth callback:', error.message);
         setError(error.message);
+        toast.error('Authentication error', {
+          description: error.message
+        });
       }
     };
     
