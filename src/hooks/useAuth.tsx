@@ -5,12 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
-// Function to extract redirectTo from URL
-const getRedirectTo = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('redirectTo') || '';
-};
-
 export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -18,36 +12,26 @@ export const useAuth = () => {
   const [error, setError] = useState<{message: string} | null>(null);
   const navigate = useNavigate();
   
-  // Handle redirect after login/signup
-  const handleRedirect = () => {
-    const redirectTo = getRedirectTo();
-    if (redirectTo) {
-      // If it's a relative URL or a biblenow.io subdomain, redirect
-      if (redirectTo.startsWith('/') || 
-          redirectTo.includes('.biblenow.io') || 
-          redirectTo === 'biblenow.io') {
-        window.location.href = decodeURIComponent(redirectTo);
-      }
-    }
-  };
-  
   // Function to sign in
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      console.log("Attempting to sign in with email/password:", email);
+      
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+      
+      console.log("Sign in response:", data, signInError);
       
       if (signInError) {
         setError({ message: signInError.message });
         return false;
       }
       
-      handleRedirect();
       return true;
     } catch (err: any) {
       console.error('Error signing in:', err.message);
@@ -64,24 +48,25 @@ export const useAuth = () => {
     setError(null);
     
     try {
+      console.log("Attempting to sign up with email/password:", email);
+      
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
+      
+      console.log("Sign up response:", data);
       
       if (signUpError) {
         setError({ message: signUpError.message });
         return false;
       }
       
-      console.log("Sign up response:", data);
-      
       // Fixed this line: use the toast function correctly
       toast('Account created', {
         description: 'Please check your email to confirm your account',
       });
       
-      handleRedirect();
       return true;
     } catch (err: any) {
       console.error('Error signing up:', err.message);

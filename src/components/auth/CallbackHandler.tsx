@@ -30,17 +30,25 @@ const CallbackHandler = () => {
           throw error;
         }
         
-        // Check if there's a redirectTo parameter
-        const redirectTo = searchParams.get('redirectTo');
+        // Check if this is a new user that needs to complete profile setup
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('has_completed_profile')
+          .eq('id', data.session.user.id)
+          .single();
+          
+        console.log("Profile data:", profileData);
         
-        if (redirectTo) {
-          console.log("Redirecting to:", decodeURIComponent(redirectTo));
-          window.location.href = decodeURIComponent(redirectTo);
-        } else {
-          // Navigate to the home page if no redirect is specified
-          console.log("No redirect specified, going to default location");
-          window.location.href = 'https://social.biblenow.io/create-profile';
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
         }
+        
+        // Determine if this is a new user that needs to complete profile
+        const needsProfileSetup = !profileData?.has_completed_profile;
+        
+        // For now, redirect all users to edit-testimony to set up their profile
+        // This matches the requirement to send all users there
+        window.location.href = 'https://social.biblenow.io/edit-testimony';
       } catch (error: any) {
         console.error('Error handling auth callback:', error.message);
         setError(error.message);

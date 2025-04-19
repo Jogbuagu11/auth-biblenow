@@ -17,7 +17,8 @@ const cookieDomain = window.location.hostname.includes('biblenow.io')
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
-    // Important: For cookie-based auth, we need to set storage to 'cookie'
+    autoRefreshToken: true,
+    // Important: For cookie-based auth across subdomains, use cookie storage
     storage: {
       getItem: (key) => document.cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() || '',
       setItem: (key, value) => {

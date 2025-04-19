@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,8 +20,6 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  
-  const redirectTo = new URLSearchParams(location.search).get('redirectTo');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,13 +37,8 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
         description: "You've been signed in.",
       });
       
-      // If redirectTo parameter exists, redirect there, otherwise go to home
-      if (redirectTo) {
-        window.location.href = decodeURIComponent(redirectTo);
-      } else {
-        // Default redirect (e.g., to a dashboard or main biblenow service)
-        window.location.href = 'https://read.biblenow.io';
-      }
+      // Redirect to social.biblenow.io/edit-testimony for consistency
+      window.location.href = 'https://social.biblenow.io/edit-testimony';
     }
   };
 
@@ -55,9 +47,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectTo 
-            ? `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`
-            : `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent('https://social.biblenow.io/edit-testimony')}`
         },
       });
       
@@ -75,9 +65,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
-          redirectTo: redirectTo 
-            ? `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`
-            : `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent('https://social.biblenow.io/edit-testimony')}`
         },
       });
       

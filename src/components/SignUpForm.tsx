@@ -78,9 +78,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectTo 
-            ? `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`
-            : `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent('https://social.biblenow.io/edit-testimony')}`
         },
       });
       
@@ -103,9 +101,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
-          redirectTo: redirectTo 
-            ? `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`
-            : `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent('https://social.biblenow.io/edit-testimony')}`
         },
       });
       
@@ -262,11 +258,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
             return;
           }
           
-          if (redirectTo) {
-            window.location.href = decodeURIComponent(redirectTo);
-          } else {
-            window.location.href = 'https://social.biblenow.io/create-profile';
-          }
+          window.location.href = 'https://social.biblenow.io/edit-testimony';
         } catch (err: any) {
           console.error('Error skipping 2FA:', err.message);
           setError({ message: err.message || 'An error occurred. Please try again.' });
@@ -336,11 +328,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           description: "Your phone number has been verified successfully",
         });
         
-        if (redirectTo) {
-          window.location.href = decodeURIComponent(redirectTo);
-        } else {
-          window.location.href = 'https://social.biblenow.io/create-profile';
-        }
+        window.location.href = 'https://social.biblenow.io/edit-testimony';
       } else {
         setError({ message: 'Invalid verification code. Please try again.' });
       }
