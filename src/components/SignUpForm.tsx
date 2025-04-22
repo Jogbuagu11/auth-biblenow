@@ -1,13 +1,13 @@
 // src/components/auth/SignUpForm.tsx
 
-import React, { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Calendar, Mail, User } from 'lucide-react';
 import { format, parse } from 'date-fns';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const SignUpForm: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +22,8 @@ const SignUpForm: React.FC = () => {
   const [ageVerified, setAgeVerified] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,19 +46,27 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
+    if (!captchaToken) {
+      setError('Please complete the CAPTCHA.');
+      return;
+    }
+
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        captchaToken,
         data: {
           first_name: firstName,
           last_name: lastName,
           gender,
           birthdate: format(birthdate, 'yyyy-MM-dd'),
         },
-        emailRedirectTo: 'https://social.biblenow.io/edit-testimony'
+        emailRedirectTo: 'https://social.biblenow.io/edit-testimony',
       }
     });
+
+    captchaRef.current?.resetCaptcha();
 
     if (signUpError) {
       setError(signUpError.message);
@@ -131,6 +141,14 @@ const SignUpForm: React.FC = () => {
         <label className="text-sm">
           I agree to the <a href="https://terms.biblenow.io" className="text-blue-600 underline">Terms</a> and <a href="https://policy.biblenow.io" className="text-blue-600 underline">Privacy Policy</a>
         </label>
+      </div>
+
+      <div className="mt-4">
+        <HCaptcha
+          sitekey="ES_32f2c40de2004ae5ba7fa7cdcde01a63"
+          onVerify={(token) => setCaptchaToken(token)}
+          ref={captchaRef}
+        />
       </div>
 
       <Button type="submit" className="w-full">
