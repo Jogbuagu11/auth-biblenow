@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import ResetPasswordModal from '@/components/auth/ResetPasswordModal';
-import { Mail, Lock, Apple, Google } from 'lucide-react';
+import { Mail, Lock, Globe } from 'lucide-react';
 
 interface SignInFormProps {
   onToggleForm: () => void;
@@ -34,7 +33,6 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
     setLoading(false);
   };
 
-  // Social sign in button handlers (can be implemented properly if requested)
   const handleSocialSignIn = (provider: "google" | "apple") => {
     toast({
       title: `Continue with ${provider === "google" ? "Google" : "Apple"} (not implemented)`,
@@ -105,11 +103,11 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       <div className="flex space-x-2 mb-1">
         <button type="button" className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
           onClick={() => handleSocialSignIn("google")}>
-          <Google size={20} /> Google
+          <Globe size={20} /> Google
         </button>
         <button type="button" className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
           onClick={() => handleSocialSignIn("apple")}>
-          <Apple size={20} /> Apple
+          <Globe size={20} /> Apple
         </button>
       </div>
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,7 +7,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format, parse } from 'date-fns';
-import { Apple, Google } from "lucide-react";
+import { Globe } from "lucide-react";
 
 interface SignUpFormProps {
   onToggleForm: () => void;
@@ -89,9 +88,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     navigate('/check-email');
   };
 
-  // Social sign in button handlers (can be implemented properly if requested)
   const handleSocialSignUp = (provider: "google" | "apple") => {
-    // Placeholder: add logic for actual social sign-in if needed
     toast({
       title: `Continue with ${provider === "google" ? "Google" : "Apple"} (not implemented)`,
       variant: "default"
@@ -185,11 +182,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       <div className="flex space-x-2 mb-1">
         <Button type="button" variant="outline" className="flex-1 flex items-center justify-center gap-2"
           onClick={() => handleSocialSignUp("google")}>
-          <Google size={20} /> Google
+          <Globe size={20} /> Google
         </Button>
         <Button type="button" variant="outline" className="flex-1 flex items-center justify-center gap-2"
           onClick={() => handleSocialSignUp("apple")}>
-          <Apple size={20} /> Apple
+          <Globe size={20} /> Apple
         </Button>
       </div>
 
