@@ -33,6 +33,42 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_signups: {
+        Row: {
+          country: string | null
+          device_type: string | null
+          email: string | null
+          id: string
+          ip_address: string | null
+          referral_source: string | null
+          signup_time: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          device_type?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          referral_source?: string | null
+          signup_time?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          device_type?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          referral_source?: string | null
+          signup_time?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       bible_kjv: {
         Row: {
           book_name: string | null
@@ -122,6 +158,66 @@ export type Database = {
         }
         Relationships: []
       }
+      denomination_requests: {
+        Row: {
+          created_at: string | null
+          id: string
+          not_approved: boolean | null
+          reason: string | null
+          requested_name: string | null
+          status: Database["public"]["Enums"]["denomination_status"] | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          not_approved?: boolean | null
+          reason?: string | null
+          requested_name?: string | null
+          status?: Database["public"]["Enums"]["denomination_status"] | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          not_approved?: boolean | null
+          reason?: string | null
+          requested_name?: string | null
+          status?: Database["public"]["Enums"]["denomination_status"] | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      denominations: {
+        Row: {
+          approved: boolean | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_flagged: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_flagged?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       email_verification_codes: {
         Row: {
           code: string
@@ -148,6 +244,38 @@ export type Database = {
           used?: boolean
         }
         Relationships: []
+      }
+      game_preferences: {
+        Row: {
+          audiospeed: number | null
+          backgroundmusic: boolean | null
+          updated_at: string | null
+          user_id: string
+          volume: number | null
+        }
+        Insert: {
+          audiospeed?: number | null
+          backgroundmusic?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          volume?: number | null
+        }
+        Update: {
+          audiospeed?: number | null
+          backgroundmusic?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       group_members: {
         Row: {
@@ -433,6 +561,33 @@ export type Database = {
           },
         ]
       }
+      password_reset_logs: {
+        Row: {
+          completed_at: string | null
+          email: string | null
+          id: string
+          ip_address: string | null
+          requested_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          requested_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          requested_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       post_attachments: {
         Row: {
           audio_url: string | null
@@ -711,9 +866,14 @@ export type Database = {
           avatar: string | null
           bio: string | null
           birthdate: string | null
+          church: string | null
           church_name: string | null
           church_place_id: string | null
+          city: string | null
+          cover_photo_url: string | null
           created_at: string | null
+          date_saved: string | null
+          denomination: string | null
           email: string | null
           first_name: string | null
           gender: string | null
@@ -728,18 +888,26 @@ export type Database = {
           phone: string | null
           phone_number: string | null
           phone_number_verified: boolean | null
+          profile_photo_url: string | null
+          state: string | null
           subscription_end_date: string | null
           subscription_status: string | null
           updated_at: string | null
           username: string | null
+          years_saved_category: string | null
         }
         Insert: {
           avatar?: string | null
           bio?: string | null
           birthdate?: string | null
+          church?: string | null
           church_name?: string | null
           church_place_id?: string | null
+          city?: string | null
+          cover_photo_url?: string | null
           created_at?: string | null
+          date_saved?: string | null
+          denomination?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
@@ -754,18 +922,26 @@ export type Database = {
           phone?: string | null
           phone_number?: string | null
           phone_number_verified?: boolean | null
+          profile_photo_url?: string | null
+          state?: string | null
           subscription_end_date?: string | null
           subscription_status?: string | null
           updated_at?: string | null
           username?: string | null
+          years_saved_category?: string | null
         }
         Update: {
           avatar?: string | null
           bio?: string | null
           birthdate?: string | null
+          church?: string | null
           church_name?: string | null
           church_place_id?: string | null
+          city?: string | null
+          cover_photo_url?: string | null
           created_at?: string | null
+          date_saved?: string | null
+          denomination?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
@@ -780,10 +956,28 @@ export type Database = {
           phone?: string | null
           phone_number?: string | null
           phone_number_verified?: boolean | null
+          profile_photo_url?: string | null
+          state?: string | null
           subscription_end_date?: string | null
           subscription_status?: string | null
           updated_at?: string | null
           username?: string | null
+          years_saved_category?: string | null
+        }
+        Relationships: []
+      }
+      public_config: {
+        Row: {
+          key: string
+          value: string | null
+        }
+        Insert: {
+          key: string
+          value?: string | null
+        }
+        Update: {
+          key?: string
+          value?: string | null
         }
         Relationships: []
       }
@@ -955,6 +1149,27 @@ export type Database = {
           },
         ]
       }
+      saved_years_ranges: {
+        Row: {
+          created_at: string | null
+          id: string
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label: string
+          sort_order: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       sent_emails: {
         Row: {
           created_at: string | null
@@ -1013,6 +1228,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      signin_logs: {
+        Row: {
+          email: string | null
+          id: string
+          ip_address: string | null
+          signed_in_at: string | null
+          success: boolean | null
+          used_2fa: boolean | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          signed_in_at?: string | null
+          success?: boolean | null
+          used_2fa?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          signed_in_at?: string | null
+          success?: boolean | null
+          used_2fa?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      signup_logs: {
+        Row: {
+          confirmed_at: string | null
+          email: string
+          id: string
+          inserted_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          email: string
+          id?: string
+          inserted_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          email?: string
+          id?: string
+          inserted_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       strongs: {
         Row: {
@@ -1191,7 +1463,6 @@ export type Database = {
       user_preferences: {
         Row: {
           audiospeed: number | null
-          backgroundmusic: boolean | null
           created_at: string | null
           fontsize: string | null
           hideversenumbers: boolean | null
@@ -1205,7 +1476,6 @@ export type Database = {
         }
         Insert: {
           audiospeed?: number | null
-          backgroundmusic?: boolean | null
           created_at?: string | null
           fontsize?: string | null
           hideversenumbers?: boolean | null
@@ -1219,7 +1489,6 @@ export type Database = {
         }
         Update: {
           audiospeed?: number | null
-          backgroundmusic?: boolean | null
           created_at?: string | null
           fontsize?: string | null
           hideversenumbers?: boolean | null
@@ -1292,7 +1561,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      denomination_status: "pending" | "approved" | "not_approved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1407,6 +1676,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      denomination_status: ["pending", "approved", "not_approved"],
+    },
   },
 } as const

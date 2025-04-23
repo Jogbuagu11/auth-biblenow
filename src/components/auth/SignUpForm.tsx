@@ -1,3 +1,4 @@
+
 // File: src/components/auth/SignUpForm.tsx
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -39,7 +40,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           first_name: firstName,
           last_name: lastName,
         },
-        captchaToken, // this token is sent to Supabase
+        captchaToken, // token from Google reCAPTCHA v2
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
@@ -122,3 +123,4 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
 };
 
 export default SignUpForm;
+
