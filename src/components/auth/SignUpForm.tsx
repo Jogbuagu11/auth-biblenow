@@ -1,9 +1,9 @@
-// File: src/components/SignUpForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 interface SignUpFormProps {
   onToggleForm: () => void;
@@ -14,6 +14,9 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<any>(null);
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -24,6 +27,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       email,
       password,
       options: {
+        captchaToken: captchaToken || '',
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -37,6 +41,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     } else {
       toast({ title: 'Check Your Email', description: 'Confirm your email to finish signing up.' });
     }
+
+    captchaRef.current?.resetCaptcha();
   };
 
   return (
@@ -85,6 +91,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           className="auth-input"
         />
       </div>
+
+      <HCaptcha
+        ref={captchaRef}
+        sitekey="3f8892b6-4d14-4d5a-841e-2792c152545e"
+        onVerify={(token) => setCaptchaToken(token)}
+      />
 
       <Button type="submit" className="w-full auth-btn-primary">
         Create Account
