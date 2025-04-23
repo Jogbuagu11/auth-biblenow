@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { format, parse } from 'date-fns';
 import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SignUpFormProps {
   onToggleForm: () => void;
@@ -31,40 +33,46 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const captchaRef = useRef<ReCAPTCHA>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    const birthdate = parse(birthDateString, 'yyyy-MM-dd', new Date());
-
-    if (!firstName || !lastName || !email || !password || !gender || !birthdate) {
-      setError('All fields are required.');
-      return;
-    }
-
-    if (!ageVerified || !agreedToTerms) {
-      setError('You must verify your age and agree to the terms.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    if (!captchaToken) {
-      setError('Please complete the CAPTCHA.');
-      return;
-    }
+    setLoading(true);
 
     try {
+      const birthdate = parse(birthDateString, 'yyyy-MM-dd', new Date());
+
+      if (!firstName || !lastName || !email || !password || !gender || !birthdate) {
+        setError('All fields are required.');
+        setLoading(false);
+        return;
+      }
+
+      if (!ageVerified || !agreedToTerms) {
+        setError('You must verify your age and agree to the terms.');
+        setLoading(false);
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.');
+        setLoading(false);
+        return;
+      }
+
+      if (!captchaToken) {
+        setError('Please complete the CAPTCHA.');
+        setLoading(false);
+        return;
+      }
+
       console.log("Attempting signup with token:", captchaToken);
       
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -75,7 +83,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
             gender,
             birthdate: format(birthdate, 'yyyy-MM-dd'),
           },
-          emailRedirectTo: `${window.location.origin}/email-confirmed`,
+          emailRedirectTo: 'https://social.biblenow.io/edit-testimony',
         }
       });
 
@@ -87,8 +95,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         return;
       }
 
-      toast({
-        title: 'Check Your Email',
+      toast.success('Check Your Email', {
         description: 'A confirmation email has been sent. Please check your inbox to finish signing up.'
       });
 
@@ -96,11 +103,14 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     } catch (error: any) {
       console.error("Unexpected error during signup:", error);
       setError(error.message || "An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSocialSignUp = async (provider: "google" | "apple") => {
     try {
+      setLoading(true);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -114,11 +124,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       
       console.log("Redirecting to OAuth provider:", data);
     } catch (error: any) {
-      toast({
-        title: `Social sign-up failed`,
-        description: error.message || "Could not connect to authentication provider",
-        variant: "destructive"
+      toast.error(`Social sign-up failed`, {
+        description: error.message || "Could not connect to authentication provider"
       });
+      setLoading(false);
     }
   };
 
@@ -238,8 +247,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         />
       </div>
 
-      <Button type="submit" className="w-full">
-        Create Account
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? 'Creating Account...' : 'Create Account'}
       </Button>
 
       <div className="flex items-center my-4">
@@ -253,6 +262,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           variant="outline" 
           className="flex-1 flex items-center justify-center gap-2"
           onClick={() => handleSocialSignUp("google")}
+          disabled={loading}
         >
           <GoogleIcon /> Google
         </Button>
@@ -261,6 +271,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           variant="outline" 
           className="flex-1 flex items-center justify-center gap-2"
           onClick={() => handleSocialSignUp("apple")}
+          disabled={loading}
         >
           <AppleIcon /> Apple
         </Button>

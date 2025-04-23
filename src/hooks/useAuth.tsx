@@ -16,7 +16,7 @@ export const useAuth = () => {
   const [error, setError] = useState<AuthError | null>(null);
   const navigate = useNavigate();
   
-  // Function to sign in
+  // Function to sign in with email/password
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
@@ -45,8 +45,58 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
+
+  // Function to sign in with phone OTP
+  const signInWithPhone = async (phone: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        phone
+      });
+      
+      if (error) {
+        setError({ message: error.message });
+        return false;
+      }
+      
+      return true;
+    } catch (err: any) {
+      setError({ message: err.message || 'An error occurred sending the OTP code' });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
   
-  // Function to sign up
+  // Function to verify OTP code
+  const verifyOtp = async (phone: string, token: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone,
+        token,
+        type: 'sms'
+      });
+      
+      if (error) {
+        setError({ message: error.message });
+        return false;
+      }
+      
+      return true;
+    } catch (err: any) {
+      setError({ message: err.message || 'An error occurred verifying the OTP code' });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Function to sign up with email/password
   const signUp = async (email: string, password: string, metadata?: Record<string, any>) => {
     setLoading(true);
     setError(null);
@@ -59,7 +109,7 @@ export const useAuth = () => {
         password,
         options: {
           data: metadata || {},
-          emailRedirectTo: 'https://auth.biblenow.io/auth/callback'
+          emailRedirectTo: 'https://social.biblenow.io/edit-testimony'
         },
       });
       
@@ -83,6 +133,33 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
+
+  // Function to sign in with OAuth providers
+  const signInWithOAuth = async (provider: 'google' | 'apple' | 'facebook' | 'github') => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      
+      if (error) {
+        setError({ message: error.message });
+        return false;
+      }
+      
+      return true;
+    } catch (err: any) {
+      setError({ message: err.message || 'An error occurred during OAuth sign-in' });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // Function to sign out
   const signOut = async () => {
@@ -92,6 +169,69 @@ export const useAuth = () => {
     } catch (err: any) {
       console.error('Error signing out:', err.message);
       setError({ message: err.message || 'An error occurred during sign out' });
+    }
+  };
+  
+  // Function to reset password
+  const resetPassword = async (email: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) {
+        setError({ message: error.message });
+        return false;
+      }
+      
+      return true;
+    } catch (err: any) {
+      setError({ message: err.message || 'An error occurred during password reset' });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Function to update user
+  const updateUser = async (updates: { email?: string; password?: string; data?: Record<string, any> }) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.updateUser(updates);
+      
+      if (error) {
+        setError({ message: error.message });
+        return false;
+      }
+      
+      return true;
+    } catch (err: any) {
+      setError({ message: err.message || 'An error occurred updating user information' });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Function to get current user
+  const getUser = async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error) {
+        setError({ message: error.message });
+        return null;
+      }
+      
+      return user;
+    } catch (err: any) {
+      setError({ message: err.message || 'An error occurred getting user information' });
+      return null;
     }
   };
   
@@ -138,5 +278,11 @@ export const useAuth = () => {
     signIn,
     signUp,
     signOut,
+    signInWithPhone,
+    verifyOtp,
+    signInWithOAuth,
+    resetPassword,
+    updateUser,
+    getUser,
   };
 };
