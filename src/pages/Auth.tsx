@@ -1,8 +1,9 @@
+
 // File: src/pages/Auth.tsx
 import React, { useState } from 'react';
 import AuthLayout from '@/components/AuthLayout';
-import SignInForm from '@/components/SignInForm';
-import SignUpForm from '@/components/SignUpForm';
+import SignInForm from '@/components/auth/SignInForm';
+import SignUpForm from '@/components/auth/SignUpForm';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const Auth: React.FC = () => {
