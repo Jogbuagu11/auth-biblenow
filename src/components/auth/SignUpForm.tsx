@@ -7,7 +7,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format, parse } from 'date-fns';
-import { Globe } from "lucide-react";
+import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
 
 interface SignUpFormProps {
   onToggleForm: () => void;
@@ -182,11 +182,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       <div className="flex space-x-2 mb-1">
         <Button type="button" variant="outline" className="flex-1 flex items-center justify-center gap-2"
           onClick={() => handleSocialSignUp("google")}>
-          <Globe size={20} /> Google
+          <GoogleIcon /> Google
         </Button>
         <Button type="button" variant="outline" className="flex-1 flex items-center justify-center gap-2"
           onClick={() => handleSocialSignUp("apple")}>
-          <Globe size={20} /> Apple
+          <AppleIcon /> Apple
         </Button>
       </div>
 

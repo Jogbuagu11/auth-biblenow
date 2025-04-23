@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import ResetPasswordModal from '@/components/auth/ResetPasswordModal';
-import { Mail, Lock, Globe } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
+import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
 
 interface SignInFormProps {
   onToggleForm: () => void;
@@ -103,11 +104,11 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       <div className="flex space-x-2 mb-1">
         <button type="button" className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
           onClick={() => handleSocialSignIn("google")}>
-          <Globe size={20} /> Google
+          <GoogleIcon /> Google
         </button>
         <button type="button" className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
           onClick={() => handleSocialSignIn("apple")}>
-          <Globe size={20} /> Apple
+          <AppleIcon /> Apple
         </button>
       </div>
 
