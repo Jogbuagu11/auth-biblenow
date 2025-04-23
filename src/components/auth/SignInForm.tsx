@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -8,10 +7,13 @@ import { Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
 import { toast } from 'sonner';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 interface SignInFormProps {
   onToggleForm: () => void;
 }
+
+const SITE_KEY = '8900e0d8-d718-4e6a-9aea-6c565f5e0ea2';
 
 const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const [email, setEmail] = useState('');
@@ -23,6 +25,8 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [isPhoneLogin, setIsPhoneLogin] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
 
@@ -31,7 +35,21 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (!captchaToken) {
+        toast.error('Please complete the CAPTCHA');
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+        options: {
+          captchaToken
+        }
+      });
+
+      captchaRef.current?.resetCaptcha();
 
       if (error) {
         toast.error('Login failed', { description: error.message });
@@ -233,6 +251,17 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
           </button>
         </div>
       )}
+
+      <div className="mt-4">
+        <HCaptcha
+          ref={captchaRef}
+          sitekey={SITE_KEY}
+          onVerify={(token) => {
+            console.log("hCaptcha token received:", token);
+            setCaptchaToken(token);
+          }}
+        />
+      </div>
 
       <button
         type="submit"
