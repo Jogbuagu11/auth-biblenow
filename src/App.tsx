@@ -9,6 +9,7 @@ import CallbackHandler from "./components/auth/CallbackHandler";
 import TwoFactorPrompt from "./components/auth/TwoFactorPrompt";
 import TwoFactorSetup from "./components/auth/TwoFactorSetup";
 import CheckEmail from "./pages/CheckEmail";
+import EmailConfirmed from "./pages/EmailConfirmed";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/auth/two-factor-prompt" element={<TwoFactorPrompt />} />
           <Route path="/auth/setup-2fa" element={<TwoFactorSetup />} />
           <Route path="/check-email" element={<CheckEmail />} />
+          <Route path="/email-confirmed" element={<EmailConfirmed />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
