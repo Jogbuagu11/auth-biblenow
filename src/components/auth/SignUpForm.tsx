@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format, parse } from 'date-fns';
 import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface SignUpFormProps {
   onToggleForm: () => void;
@@ -28,6 +29,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<ReCAPTCHA>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -58,34 +61,42 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       return;
     }
 
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        captchaToken,
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          gender,
-          birthdate: format(birthdate, 'yyyy-MM-dd'),
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+    try {
+      console.log("Attempting signup with token:", captchaToken);
+      
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          captchaToken,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            gender,
+            birthdate: format(birthdate, 'yyyy-MM-dd'),
+          },
+          emailRedirectTo: `${window.location.origin}/email-confirmed`,
+        }
+      });
+
+      captchaRef.current?.reset();
+
+      if (signUpError) {
+        console.error("Signup error:", signUpError);
+        setError(signUpError.message);
+        return;
       }
-    });
 
-    captchaRef.current?.reset();
+      toast({
+        title: 'Check Your Email',
+        description: 'A confirmation email has been sent. Please check your inbox to finish signing up.'
+      });
 
-    if (signUpError) {
-      setError(signUpError.message);
-      return;
+      navigate('/check-email');
+    } catch (error: any) {
+      console.error("Unexpected error during signup:", error);
+      setError(error.message || "An unexpected error occurred");
     }
-
-    toast({
-      title: 'Check Your Email',
-      description: 'A confirmation email has been sent. Please check your inbox to finish signing up.'
-    });
-
-    navigate('/check-email');
   };
 
   const handleSocialSignUp = async (provider: "google" | "apple") => {
@@ -109,6 +120,14 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         variant: "destructive"
       });
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
@@ -158,12 +177,42 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
 
       <div>
         <label className="block text-sm text-biblenow-beige">Password</label>
-        <input type="password" className="auth-input" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <div className="relative">
+          <input 
+            type={showPassword ? "text" : "password"} 
+            className="auth-input pr-10" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+          />
+          <button 
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-biblenow-beige/40 hover:text-biblenow-beige"
+            onClick={togglePasswordVisibility}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
       </div>
 
       <div>
         <label className="block text-sm text-biblenow-beige">Confirm Password</label>
-        <input type="password" className="auth-input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+        <div className="relative">
+          <input 
+            type={showConfirmPassword ? "text" : "password"} 
+            className="auth-input pr-10" 
+            value={confirmPassword} 
+            onChange={(e) => setConfirmPassword(e.target.value)} 
+            required 
+          />
+          <button 
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-biblenow-beige/40 hover:text-biblenow-beige"
+            onClick={toggleConfirmPasswordVisibility}
+          >
+            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center space-x-2">
@@ -182,7 +231,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         <ReCAPTCHA
           ref={captchaRef}
           sitekey={SITE_KEY}
-          onChange={(token) => setCaptchaToken(token)}
+          onChange={(token) => {
+            console.log("ReCAPTCHA token received:", token);
+            setCaptchaToken(token);
+          }}
         />
       </div>
 

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import ResetPasswordModal from '@/components/auth/ResetPasswordModal';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
 
@@ -15,6 +15,7 @@ interface SignInFormProps {
 const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -63,6 +64,10 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <form onSubmit={handleSignIn} className="space-y-6">
       <div className="text-center">
@@ -84,13 +89,20 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       <div className="relative">
         <Lock className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="auth-input pl-10"
+          className="auth-input pl-10 pr-10"
           required
         />
+        <button
+          type="button"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-biblenow-beige/40 hover:text-biblenow-beige"
+          onClick={togglePasswordVisibility}
+        >
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
       </div>
 
       <div className="flex justify-between items-center text-sm">
