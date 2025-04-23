@@ -88,11 +88,27 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     navigate('/check-email');
   };
 
-  const handleSocialSignUp = (provider: "google" | "apple") => {
-    toast({
-      title: `Continue with ${provider === "google" ? "Google" : "Apple"} (not implemented)`,
-      variant: "default"
-    });
+  const handleSocialSignUp = async (provider: "google" | "apple") => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log("Redirecting to OAuth provider:", data);
+    } catch (error: any) {
+      toast({
+        title: `Social sign-up failed`,
+        description: error.message || "Could not connect to authentication provider",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -180,12 +196,20 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         <div className="flex-grow h-px bg-biblenow-beige/20"></div>
       </div>
       <div className="flex space-x-2 mb-1">
-        <Button type="button" variant="outline" className="flex-1 flex items-center justify-center gap-2"
-          onClick={() => handleSocialSignUp("google")}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex-1 flex items-center justify-center gap-2"
+          onClick={() => handleSocialSignUp("google")}
+        >
           <GoogleIcon /> Google
         </Button>
-        <Button type="button" variant="outline" className="flex-1 flex items-center justify-center gap-2"
-          onClick={() => handleSocialSignUp("apple")}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex-1 flex items-center justify-center gap-2"
+          onClick={() => handleSocialSignUp("apple")}
+        >
           <AppleIcon /> Apple
         </Button>
       </div>

@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import ResetPasswordModal from '@/components/auth/ResetPasswordModal';
 import { Mail, Lock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
 
 interface SignInFormProps {
@@ -34,11 +36,31 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
     setLoading(false);
   };
 
-  const handleSocialSignIn = (provider: "google" | "apple") => {
-    toast({
-      title: `Continue with ${provider === "google" ? "Google" : "Apple"} (not implemented)`,
-      variant: "default"
-    });
+  const handleSocialSignIn = async (provider: "google" | "apple") => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // User will be redirected to OAuth provider
+      console.log("Redirecting to OAuth provider:", data);
+    } catch (error: any) {
+      toast({
+        title: `Social sign-in failed`,
+        description: error.message || "Could not connect to authentication provider",
+        variant: "destructive"
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -102,14 +124,24 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
         <div className="flex-grow h-px bg-biblenow-beige/20"></div>
       </div>
       <div className="flex space-x-2 mb-1">
-        <button type="button" className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
-          onClick={() => handleSocialSignIn("google")}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
+          onClick={() => handleSocialSignIn("google")}
+          disabled={loading}
+        >
           <GoogleIcon /> Google
-        </button>
-        <button type="button" className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
-          onClick={() => handleSocialSignIn("apple")}>
+        </Button>
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
+          onClick={() => handleSocialSignIn("apple")}
+          disabled={loading}
+        >
           <AppleIcon /> Apple
-        </button>
+        </Button>
       </div>
 
       <ResetPasswordModal isOpen={showReset} onClose={() => setShowReset(false)} />
