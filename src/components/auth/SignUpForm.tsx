@@ -94,7 +94,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
 
       <HCaptcha
         ref={captchaRef}
-        sitekey="3f8892b6-4d14-4d5a-841e-2792c152545e"
+        sitekey="ES_32f2c40de2004ae5ba7fa7cdcde01a63"
         onVerify={(token) => setCaptchaToken(token)}
       />
 
