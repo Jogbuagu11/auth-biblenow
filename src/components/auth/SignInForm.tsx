@@ -4,9 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import ResetPasswordModal from '@/components/auth/ResetPasswordModal';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
+import { toast } from 'sonner';
 
 interface SignInFormProps {
   onToggleForm: () => void;
@@ -15,26 +16,86 @@ interface SignInFormProps {
 const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [isPhoneLogin, setIsPhoneLogin] = useState(false);
+  const { toast: uiToast } = useToast();
   const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) {
-      toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Welcome back!', description: 'Signed in successfully.' });
-      navigate('/edit-testimony');
+      if (error) {
+        toast.error('Login failed', { description: error.message });
+      } else {
+        toast.success('Welcome back!', { description: 'Signed in successfully.' });
+        navigate('/edit-testimony');
+      }
+    } catch (error: any) {
+      toast.error('An unexpected error occurred', { description: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePhoneSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!phone) {
+      toast.error('Phone number is required');
+      return;
     }
 
-    setLoading(false);
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOtp({
+        phone: phone
+      });
+
+      if (error) {
+        toast.error('SMS sign-in failed', { description: error.message });
+      } else {
+        setOtpSent(true);
+        toast.success('OTP code sent', { description: 'Please check your phone for verification code.' });
+      }
+    } catch (error: any) {
+      toast.error('An unexpected error occurred', { description: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: phone,
+        token: otpCode,
+        type: 'sms'
+      });
+
+      if (error) {
+        toast.error('OTP verification failed', { description: error.message });
+      } else {
+        toast.success('Verified successfully!');
+        navigate('/edit-testimony');
+      }
+    } catch (error: any) {
+      toast.error('An unexpected error occurred', { description: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSocialSignIn = async (provider: "google" | "apple") => {
@@ -55,10 +116,8 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       // User will be redirected to OAuth provider
       console.log("Redirecting to OAuth provider:", data);
     } catch (error: any) {
-      toast({
-        title: `Social sign-in failed`,
-        description: error.message || "Could not connect to authentication provider",
-        variant: "destructive"
+      toast.error(`Social sign-in failed`, {
+        description: error.message || "Could not connect to authentication provider"
       });
       setLoading(false);
     }
@@ -68,66 +127,124 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
     setShowPassword(!showPassword);
   };
 
+  const switchAuthMode = () => {
+    setIsPhoneLogin(!isPhoneLogin);
+    setOtpSent(false); // Reset OTP state when switching modes
+  };
+
   return (
-    <form onSubmit={handleSignIn} className="space-y-6">
+    <form onSubmit={isPhoneLogin ? (otpSent ? verifyOtp : handlePhoneSignIn) : handleSignIn} className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-semibold text-biblenow-beige">Sign In</h2>
+        <div className="mt-2">
+          <Button 
+            type="button" 
+            variant="ghost" 
+            onClick={switchAuthMode} 
+            className="text-sm text-biblenow-gold hover:text-biblenow-gold/80"
+          >
+            {isPhoneLogin ? "Use Email Instead" : "Use Phone Instead"}
+          </Button>
+        </div>
       </div>
 
-      <div className="relative">
-        <Mail className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
-        <input
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="auth-input pl-10"
-          required
-        />
-      </div>
+      {isPhoneLogin ? (
+        <>
+          {!otpSent ? (
+            <div className="relative">
+              <Phone className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
+              <input
+                type="tel"
+                placeholder="+1234567890"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="auth-input pl-10"
+                required
+              />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Enter verification code"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  className="auth-input"
+                  required
+                />
+              </div>
+              <p className="text-sm text-biblenow-beige/60">
+                Enter the code sent to {phone}
+              </p>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="relative">
+            <Mail className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="auth-input pl-10"
+              required
+            />
+          </div>
 
-      <div className="relative">
-        <Lock className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="auth-input pl-10 pr-10"
-          required
-        />
-        <button
-          type="button"
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-biblenow-beige/40 hover:text-biblenow-beige"
-          onClick={togglePasswordVisibility}
-        >
-          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-        </button>
-      </div>
+          <div className="relative">
+            <Lock className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="auth-input pl-10 pr-10"
+              required
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-biblenow-beige/40 hover:text-biblenow-beige"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </>
+      )}
 
-      <div className="flex justify-between items-center text-sm">
-        <button
-          type="button"
-          onClick={() => setShowReset(true)}
-          className="text-biblenow-gold hover:underline"
-        >
-          Forgot Password?
-        </button>
-        <button
-          type="button"
-          onClick={onToggleForm}
-          className="text-biblenow-gold hover:underline"
-        >
-          Create Account
-        </button>
-      </div>
+      {!isPhoneLogin && (
+        <div className="flex justify-between items-center text-sm">
+          <button
+            type="button"
+            onClick={() => setShowReset(true)}
+            className="text-biblenow-gold hover:underline"
+          >
+            Forgot Password?
+          </button>
+          <button
+            type="button"
+            onClick={onToggleForm}
+            className="text-biblenow-gold hover:underline"
+          >
+            Create Account
+          </button>
+        </div>
+      )}
 
       <button
         type="submit"
         className="auth-btn-primary w-full"
         disabled={loading}
       >
-        {loading ? 'Signing in...' : 'Sign In'}
+        {loading 
+          ? 'Please wait...' 
+          : isPhoneLogin 
+            ? (otpSent ? 'Verify Code' : 'Send Code') 
+            : 'Sign In'
+        }
       </button>
 
       <div className="flex items-center my-4">

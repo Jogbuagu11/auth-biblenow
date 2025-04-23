@@ -45,6 +45,10 @@ const CallbackHandler = () => {
           console.error("Error fetching profile:", profileError);
         }
         
+        // Get the user
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log("Current user:", user);
+        
         // Handle redirect if specified in the URL
         if (redirectTo) {
           console.log("Redirecting to:", decodeURIComponent(redirectTo));

@@ -1,107 +1,101 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useApi } from '@/hooks/useApi';
-import { useToast } from '@/components/ui/use-toast';
+
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Mail } from 'lucide-react';
 
 interface ResetPasswordModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isOpen, onClose }) => {
+const ResetPasswordModal = ({ isOpen, onClose }: ResetPasswordModalProps) => {
   const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [step, setStep] = useState<'email' | 'verify' | 'newPassword'>('email');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const { requestPasswordReset, resetPassword } = useApi();
-  const { toast } = useToast();
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  const handleSendResetCode = async () => {
-    const { error } = await requestPasswordReset(email);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
 
-    if (error) {
-      toast({ title: 'Error', description: error, variant: 'destructive' });
-    } else {
-      toast({ title: 'Code Sent', description: 'Check your email for a verification code.' });
-      setStep('verify');
+      if (error) {
+        toast.error('Password reset failed', { description: error.message });
+      } else {
+        setIsSuccess(true);
+        toast.success('Reset email sent', { description: 'Check your inbox for password reset instructions.' });
+      }
+    } catch (error: any) {
+      toast.error('An unexpected error occurred', { description: error.message });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleVerifyCode = async () => {
-    // In this setup, Supabase handles the link itself — you could skip this or customize further.
-    setStep('newPassword');
-  };
-
-  const handleResetPassword = async () => {
-    const { error } = await resetPassword(email, newPassword);
-
-    if (error) {
-      toast({ title: 'Error', description: error, variant: 'destructive' });
-    } else {
-      toast({ title: 'Success', description: 'Password reset successfully.' });
-      onClose();
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Reset Password</DialogTitle>
-          <DialogDescription>
-            {step === 'email' && 'Enter your email to reset your password'}
-            {step === 'verify' && 'Check your email for the verification code'}
-            {step === 'newPassword' && 'Set a new password'}
-          </DialogDescription>
-        </DialogHeader>
-
-        {step === 'email' && (
-          <div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="auth-input w-full"
-            />
-            <button onClick={handleSendResetCode} className="auth-btn-primary mt-4 w-full">
-              Send Reset Code
-            </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-biblenow-dark border border-biblenow-beige/20 rounded-lg p-8 max-w-md w-full">
+        <h2 className="text-2xl font-semibold text-biblenow-beige mb-6">Reset Password</h2>
+        
+        {!isSuccess ? (
+          <form onSubmit={handleResetPassword}>
+            <p className="text-biblenow-beige/80 mb-6">
+              Enter your email address and we'll send you instructions to reset your password.
+            </p>
+            
+            <div className="relative mb-6">
+              <Mail className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="auth-input pl-10"
+                required
+              />
+            </div>
+            
+            <div className="flex space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                className="flex-1"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="text-center">
+            <p className="text-biblenow-beige/80 mb-6">
+              Password reset instructions have been sent to <strong>{email}</strong>. 
+              Please check your inbox.
+            </p>
+            <Button 
+              type="button"
+              onClick={onClose}
+            >
+              Close
+            </Button>
           </div>
         )}
-
-        {step === 'verify' && (
-          <div>
-            <input
-              type="text"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="Enter verification code"
-              className="auth-input w-full"
-            />
-            <button onClick={handleVerifyCode} className="auth-btn-primary mt-4 w-full">
-              Verify Code
-            </button>
-          </div>
-        )}
-
-        {step === 'newPassword' && (
-          <div>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password"
-              className="auth-input w-full"
-            />
-            <button onClick={handleResetPassword} className="auth-btn-primary mt-4 w-full">
-              Reset Password
-            </button>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
