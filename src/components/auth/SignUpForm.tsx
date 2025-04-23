@@ -1,10 +1,9 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format, parse } from 'date-fns';
@@ -16,7 +15,7 @@ interface SignUpFormProps {
   onToggleForm: () => void;
 }
 
-const SITE_KEY = '6LcdPCErAAAAAE16XMD28du5yaoswveHFNPqI3NA';
+const SITE_KEY = '8900e0d8-d718-4e6a-9aea-6c565f5e0ea2';
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [firstName, setFirstName] = useState('');
@@ -30,7 +29,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<ReCAPTCHA>(null);
+  const captchaRef = useRef<HCaptcha>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -87,7 +86,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
         }
       });
 
-      captchaRef.current?.reset();
+      captchaRef.current?.resetCaptcha();
 
       if (signUpError) {
         console.error("Signup error:", signUpError);
@@ -237,11 +236,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       </div>
 
       <div className="mt-4">
-        <ReCAPTCHA
+        <HCaptcha
           ref={captchaRef}
           sitekey={SITE_KEY}
-          onChange={(token) => {
-            console.log("ReCAPTCHA token received:", token);
+          onVerify={(token) => {
+            console.log("hCaptcha token received:", token);
             setCaptchaToken(token);
           }}
         />
