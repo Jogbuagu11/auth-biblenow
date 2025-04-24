@@ -73,7 +73,7 @@ const TwoFactorPrompt: React.FC = () => {
         <Button 
           onClick={handleSkip2FA} 
           variant="outline" 
-          className="w-full border-biblenow-gold/30 text-biblenow-brown hover:bg-biblenow-gold/10"
+          className="w-full border-biblenow-gold/30 text-white hover:bg-biblenow-gold/10"
         >
           Remind Me Later
         </Button>
