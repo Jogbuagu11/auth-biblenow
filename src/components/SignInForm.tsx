@@ -19,29 +19,47 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const [showReset, setShowReset] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = React.useRef(null);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      if (!captchaToken) {
+        toast.error('Please complete the CAPTCHA');
+        setLoading(false);
+        return;
+      }
 
-    if (signInError) {
-      setError(signInError.message);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+        options: {
+          captchaToken
+        }
+      });
+
+      captchaRef.current?.resetCaptcha();
+
+      if (error) {
+        toast.error('Login failed', { description: error.message });
+        return;
+      }
+
+      // Check if this is the first login
+      if (data.session?.user && !data.session.user.user_metadata?.has_completed_2fa && !data.session.user.user_metadata?.twofa_skipped) {
+        navigate('/auth/setup-2fa');
+      } else {
+        toast.success('Welcome back!');
+        window.location.href = 'https://social.biblenow.io/edit-testimony';
+      }
+    } catch (error: any) {
+      toast.error('An unexpected error occurred');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    toast({
-      title: 'Signed in',
-      description: 'Welcome back!',
-    });
-
-    navigate('/edit-testimony');
   };
 
   return (

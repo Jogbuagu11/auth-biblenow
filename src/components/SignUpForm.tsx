@@ -1,4 +1,3 @@
-
 // src/components/auth/SignUpForm.tsx
 
 import { useState, useRef } from 'react';
@@ -52,7 +51,7 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -63,7 +62,7 @@ const SignUpForm: React.FC = () => {
           gender,
           birthdate: format(birthdate, 'yyyy-MM-dd'),
         },
-        emailRedirectTo: `${window.location.origin}/email-confirmed`,
+        emailRedirectTo: 'https://auth.biblenow.io/email-confirmed',
       }
     });
 

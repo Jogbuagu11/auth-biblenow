@@ -1,15 +1,16 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 const TwoFactorSetup: React.FC = () => {
-  const [contact, setContact] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState<'input' | 'verify'>('input');
   const [expectedCode, setExpectedCode] = useState('');
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const sendCode = async () => {
@@ -19,47 +20,78 @@ const TwoFactorSetup: React.FC = () => {
     } = await supabase.auth.getUser();
 
     if (error || !user) {
-      toast({ title: 'Error', description: 'Unable to retrieve user.' });
+      toast.error('Unable to retrieve user');
       return;
     }
 
-    const isEmail = contact.includes('@');
-    const functionName = isEmail ? 'send-verification-code' : 'send-2fa-sms';
+    try {
+      setLoading(true);
+      const { data, error: funcError } = await supabase.functions.invoke('setup-2fa', {
+        body: {
+          user_id: user.id,
+          phone_number: phoneNumber,
+        },
+      });
 
-    const { data, error: funcError } = await supabase.functions.invoke(functionName, {
-      body: {
-        user_id: user.id,
-        ...(isEmail ? { email: contact } : { phone_number: contact }),
-      },
-    });
+      if (funcError || !data?.verification_code) {
+        toast.error('Failed to send verification code');
+        return;
+      }
 
-    if (funcError || !data?.verification_code) {
-      toast({ title: 'Error', description: 'Failed to send verification code.' });
-      return;
+      setExpectedCode(data.verification_code);
+      setStep('verify');
+      toast.success('Code sent to your phone');
+    } catch (err: any) {
+      toast.error('Failed to send code');
+    } finally {
+      setLoading(false);
     }
-
-    setExpectedCode(data.verification_code);
-    setStep('verify');
-    toast({ title: 'Code Sent', description: `Check your ${isEmail ? 'email' : 'phone'}` });
   };
 
   const verifyCode = async () => {
     if (code !== expectedCode) {
-      toast({ title: 'Error', description: 'Invalid verification code.' });
+      toast.error('Invalid verification code');
       return;
     }
 
-    const update = await supabase.auth.updateUser({
-      data: { has_completed_2fa: true },
-    });
+    try {
+      setLoading(true);
+      const update = await supabase.auth.updateUser({
+        data: { has_completed_2fa: true },
+      });
 
-    if (update.error) {
-      toast({ title: 'Error', description: 'Failed to enable 2FA.' });
-      return;
+      if (update.error) {
+        toast.error('Failed to enable 2FA');
+        return;
+      }
+
+      toast.success('Two-Factor Authentication enabled');
+      window.location.href = 'https://social.biblenow.io/edit-testimony';
+    } catch (err: any) {
+      toast.error('Failed to enable 2FA');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    toast({ title: 'Success', description: 'Two-Factor Authentication enabled.' });
-    navigate('/edit-testimony');
+  const handleDecline = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.updateUser({
+        data: { twofa_skipped: true },
+      });
+
+      if (error) {
+        toast.error('Failed to update preferences');
+        return;
+      }
+
+      window.location.href = 'https://social.biblenow.io/edit-testimony';
+    } catch (err: any) {
+      toast.error('Failed to skip 2FA');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,22 +99,32 @@ const TwoFactorSetup: React.FC = () => {
       {step === 'input' ? (
         <>
           <h2 className="text-xl font-bold mb-4 text-biblebrown-900">Set Up 2FA</h2>
-          <p className="mb-4 text-biblebrown-700">Enter your phone number or email to receive a verification code.</p>
+          <p className="mb-4 text-biblebrown-700">Enter your phone number to receive verification codes.</p>
           <input
-            type="text"
+            type="tel"
             className="w-full p-2 border rounded mb-4"
-            placeholder="+1 555 123 4567 or your@email.com"
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
+            placeholder="+1234567890"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           />
-          <Button className="w-full" onClick={sendCode}>
-            Send Verification Code
-          </Button>
+          <div className="space-y-2">
+            <Button className="w-full" onClick={sendCode} disabled={loading}>
+              {loading ? 'Sending...' : 'Send Verification Code'}
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={handleDecline}
+              disabled={loading}
+            >
+              Skip 2FA Setup
+            </Button>
+          </div>
         </>
       ) : (
         <>
           <h2 className="text-xl font-bold mb-4 text-biblebrown-900">Verify Your Code</h2>
-          <p className="mb-4 text-biblebrown-700">Enter the 6-digit code sent to your {contact.includes('@') ? 'email' : 'phone'}.</p>
+          <p className="mb-4 text-biblebrown-700">Enter the code sent to your phone.</p>
           <input
             type="text"
             className="w-full p-2 border rounded mb-4 text-center text-xl tracking-widest"
@@ -91,8 +133,8 @@ const TwoFactorSetup: React.FC = () => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
-          <Button className="w-full" onClick={verifyCode}>
-            Verify Code
+          <Button className="w-full" onClick={verifyCode} disabled={loading}>
+            {loading ? 'Verifying...' : 'Verify Code'}
           </Button>
         </>
       )}
