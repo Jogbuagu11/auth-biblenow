@@ -8,6 +8,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+type VerificationType = "SIGNUP" | "INVITE" | "RESET_PASSWORD" | "CHANGE_EMAIL";
+
+interface RequestBody {
+  email: string;
+  type: VerificationType;
+  url: string;
+}
+
 serve(async (req) => {
   // Handle CORS preflight request
   if (req.method === "OPTIONS") {
@@ -16,11 +24,11 @@ serve(async (req) => {
 
   try {
     // Get request data
-    const { email } = await req.json();
+    const { email, type, url }: RequestBody = await req.json();
     
-    if (!email) {
+    if (!email || !type || !url) {
       return new Response(
-        JSON.stringify({ error: "Email is required" }),
+        JSON.stringify({ error: "Email, type and URL are required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -39,52 +47,33 @@ serve(async (req) => {
       .insert({
         email,
         code,
+        type,
         expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 minutes expiry
+        used: false
       });
 
-    // Initialize Postmark client
-    const postmarkToken = Deno.env.get("POSTMARK_API_TOKEN");
+    // Determine email provider based on type
+    const provider = (type === "SIGNUP" || type === "INVITE") ? "RESEND" : "POSTMARK";
     
-    // Send email with Postmark
-    const response = await fetch("https://api.postmarkapp.com/email", {
+    // Call send-email edge function
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
       method: "POST",
       headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "X-Postmark-Server-Token": postmarkToken || "",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        From: "verification@biblenow.io",
-        To: email,
-        Subject: "BibleNOW Verification Code",
-        HtmlBody: `
-          <html>
-            <body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-              <div style="background-color: #3E2723; padding: 20px; text-align: center;">
-                <h1 style="color: #d4af37; margin: 0;">BibleNOW</h1>
-              </div>
-              <div style="padding: 20px; background-color: #f5f5dc; border: 1px solid #d4af37;">
-                <h2>Verification Code</h2>
-                <p>Thank you for signing up with BibleNOW. Please use the following code to verify your email address:</p>
-                <div style="background-color: #3E2723; color: #d4af37; font-size: 24px; padding: 10px; text-align: center; letter-spacing: 5px; margin: 20px 0; font-weight: bold;">
-                  ${code}
-                </div>
-                <p>This code will expire in 15 minutes.</p>
-                <p>If you did not request this code, please ignore this email.</p>
-              </div>
-              <div style="padding: 10px; text-align: center; font-size: 12px; color: #666;">
-                <p>&copy; ${new Date().getFullYear()} BibleNOW. All rights reserved.</p>
-              </div>
-            </body>
-          </html>
-        `,
-        TextBody: `Your BibleNOW verification code is: ${code}. This code will expire in 15 minutes.`,
-      }),
+        to: email,
+        type,
+        code,
+        url,
+        provider
+      })
     });
 
     if (!response.ok) {
       const error = await response.json();
-      console.error("Postmark error:", error);
+      console.error("Email sending error:", error);
       return new Response(
         JSON.stringify({ error: "Failed to send verification email" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
