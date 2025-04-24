@@ -1,1 +1,14 @@
+
+# project_id must be first
 project_id = "jhlawjmyorpmafokxtuh"
+
+[auth]
+enable_signup = true
+enable_confirmations = true
+
+[auth.email]
+enable_confirmations = true
+# Enable the custom email handler which uses Resend
+enable_custom_smtp = true
+
+# ... keep existing code (other config sections)
