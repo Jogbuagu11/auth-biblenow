@@ -13,7 +13,20 @@ const TwoFactorSetup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const formatPhoneNumber = (value: string) => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+      return `+1 (${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    return `+1 (${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  };
+
   const sendCode = async () => {
+    const cleanedPhoneNumber = phoneNumber.replace(/[^\d]/g, '');
+    
     const {
       data: { user },
       error,
@@ -29,7 +42,7 @@ const TwoFactorSetup: React.FC = () => {
       const { data, error: funcError } = await supabase.functions.invoke('setup-2fa', {
         body: {
           user_id: user.id,
-          phone_number: phoneNumber,
+          phone_number: cleanedPhoneNumber,
         },
       });
 
@@ -98,14 +111,15 @@ const TwoFactorSetup: React.FC = () => {
     <div className="max-w-md w-full mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
       {step === 'input' ? (
         <>
-          <h2 className="text-xl font-bold mb-4 text-biblebrown-900">Set Up 2FA</h2>
-          <p className="mb-4 text-biblebrown-700">Enter your phone number to receive verification codes.</p>
+          <h2 className="text-xl font-bold mb-4 text-black">Set Up 2FA</h2>
+          <p className="mb-4 text-black">Enter your phone number to receive verification codes.</p>
           <input
             type="tel"
             className="w-full p-2 border rounded mb-4"
-            placeholder="+1234567890"
-            value={phoneNumber}
+            placeholder="+1 (234) 567-8910"
+            value={formatPhoneNumber(phoneNumber)}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            maxLength={17}
           />
           <div className="space-y-2">
             <Button className="w-full" onClick={sendCode} disabled={loading}>
