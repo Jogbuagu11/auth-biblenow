@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(
@@ -9,8 +10,8 @@ export const supabase = createClient(
       autoRefreshToken: true,
       detectSessionInUrl: true,
       persistSession: true,
-      // Add custom confirmation URL to redirect to /email-confirmed
-      redirectTo: `${window.location.origin}/email-confirmed`
+      // The redirectTo option should be in the signUp/signIn options, not in the client config
+      // It will be passed to the respective auth methods when needed
     }
   }
 );

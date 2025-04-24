@@ -1,3 +1,4 @@
+
 // src/components/auth/SignUpForm.tsx
 
 import { useState, useRef } from 'react';
@@ -62,7 +63,7 @@ const SignUpForm: React.FC = () => {
           gender,
           birthdate: format(birthdate, 'yyyy-MM-dd'),
         },
-        emailRedirectTo: 'https://social.biblenow.io/edit-testimony',
+        emailRedirectTo: `${window.location.origin}/email-confirmed`,
       }
     });
 
