@@ -190,30 +190,27 @@ export type Database = {
       }
       denominations: {
         Row: {
-          approved: boolean | null
           created_at: string | null
           description: string | null
-          id: string
-          is_flagged: boolean | null
           name: string
+          sort_order: number | null
+          status: Database["public"]["Enums"]["status"] | null
           updated_at: string | null
         }
         Insert: {
-          approved?: boolean | null
           created_at?: string | null
           description?: string | null
-          id: string
-          is_flagged?: boolean | null
           name: string
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["status"] | null
           updated_at?: string | null
         }
         Update: {
-          approved?: boolean | null
           created_at?: string | null
           description?: string | null
-          id?: string
-          is_flagged?: boolean | null
           name?: string
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["status"] | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1562,6 +1559,7 @@ export type Database = {
     }
     Enums: {
       denomination_status: "pending" | "approved" | "not_approved"
+      status: "pending" | "approved" | "not_approved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1678,6 +1676,7 @@ export const Constants = {
   public: {
     Enums: {
       denomination_status: ["pending", "approved", "not_approved"],
+      status: ["pending", "approved", "not_approved"],
     },
   },
 } as const
