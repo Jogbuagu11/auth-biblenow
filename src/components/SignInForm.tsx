@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,7 +29,11 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
 
     try {
       if (!captchaToken) {
-        toast.error('Please complete the CAPTCHA');
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: 'Please complete the CAPTCHA'
+        });
         setLoading(false);
         return;
       }
@@ -44,7 +49,11 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       captchaRef.current?.resetCaptcha();
 
       if (error) {
-        toast.error('Login failed', { description: error.message });
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: error.message
+        });
         return;
       }
 
@@ -52,11 +61,18 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       if (data.session?.user && !data.session.user.user_metadata?.has_completed_2fa && !data.session.user.user_metadata?.twofa_skipped) {
         navigate('/auth/setup-2fa');
       } else {
-        toast.success('Welcome back!');
+        toast({
+          title: "Welcome back!",
+          description: "Signed in successfully."
+        });
         window.location.href = 'https://social.biblenow.io/edit-testimony';
       }
     } catch (error: any) {
-      toast.error('An unexpected error occurred');
+      toast({
+        variant: "destructive",
+        title: "An unexpected error occurred",
+        description: error.message || "Please try again later"
+      });
     } finally {
       setLoading(false);
     }
