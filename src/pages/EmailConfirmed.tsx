@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const EmailConfirmed: React.FC = () => {
   const handleLoginClick = () => {
-    window.location.href = 'https://auth.biblenow.io/email-confirmed';
+    window.location.href = 'https://auth.biblenow.io/login';
   };
 
   return (
@@ -27,3 +27,4 @@ const EmailConfirmed: React.FC = () => {
 };
 
 export default EmailConfirmed;
+

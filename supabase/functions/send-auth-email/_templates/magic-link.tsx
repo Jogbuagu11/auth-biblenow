@@ -1,4 +1,3 @@
-
 import {
   Body,
   Container,
@@ -33,7 +32,7 @@ export const MagicLinkEmail = ({
       <Container style={container}>
         <Heading style={h1}>BibleNOW Authentication</Heading>
         <Link
-          href={`${supabase_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect_to}`}
+          href={`${supabase_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=https://auth.biblenow.io/email-confirmed`}
           target="_blank"
           style={{
             ...link,
