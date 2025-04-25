@@ -1,3 +1,4 @@
+
 // File: src/pages/AuthCallback.tsx
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -14,7 +15,8 @@ const AuthCallback = () => {
       
       // If this is specifically an email confirmation, redirect to email-confirmed
       if (type === 'email_confirmation') {
-        navigate('/email-confirmed');
+        // Redirect to the full URL as required
+        window.location.href = 'https://auth.biblenow.io/email-confirmed';
         return;
       }
       
