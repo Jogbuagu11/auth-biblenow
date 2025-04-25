@@ -1,15 +1,26 @@
 // File: src/pages/AuthCallback.tsx
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
-
+  const [searchParams] = useSearchParams();
+  
   useEffect(() => {
     const handleRedirect = async () => {
+      // Check if this is an email confirmation link
+      const type = searchParams.get('type');
+      
+      // If this is specifically an email confirmation, redirect to email-confirmed
+      if (type === 'email_confirmation') {
+        navigate('/email-confirmed');
+        return;
+      }
+      
+      // Otherwise, proceed with normal auth flow
       const { data } = await supabase.auth.getSession();
-      const redirectTo = new URLSearchParams(window.location.search).get('redirectTo');
+      const redirectTo = searchParams.get('redirectTo');
 
       if (data.session) {
         // Check if 2FA has been enabled or skipped
@@ -30,9 +41,9 @@ const AuthCallback = () => {
     };
 
     handleRedirect();
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
-  return <p className="text-center mt-10 text-biblebrown-800">Logging you in...</p>;
+  return <p className="text-center mt-10 text-biblebrown-800">Loading...</p>;
 };
 
 export default AuthCallback;
