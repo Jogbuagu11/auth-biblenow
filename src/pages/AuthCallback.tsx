@@ -23,7 +23,7 @@ const AuthCallback = () => {
         }
         
         // Otherwise, proceed with normal redirect
-        window.location.href = redirectTo || 'https://social.biblenow.io/edit-testimony';
+        window.location.href = redirectTo || 'https://auth.biblenow.io/email-confirmed';
       } else {
         navigate('/auth'); // fallback if session fails
       }
