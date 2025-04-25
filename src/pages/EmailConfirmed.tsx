@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const EmailConfirmed: React.FC = () => {
   const handleLoginClick = () => {
-    window.location.href = 'https://auth.biblenow.io/login';
+    window.location.href = 'https://auth.biblenow.io/email-confirmed';
   };
 
   return (
