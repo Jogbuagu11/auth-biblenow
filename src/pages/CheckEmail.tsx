@@ -44,6 +44,9 @@ const CheckEmail: React.FC = () => {
         <p className="text-center text-biblenow-beige/70">
           Please check your email for a confirmation link. Once you confirm, you can sign in!
         </p>
+        <p className="text-sm text-biblenow-beige/50 text-center">
+          Didn't receive the email?
+        </p>
         <Button 
           onClick={handleResendEmail} 
           disabled={isResending}
@@ -52,9 +55,6 @@ const CheckEmail: React.FC = () => {
         >
           {isResending ? "Resending..." : "Resend"}
         </Button>
-        <p className="text-sm text-biblenow-beige/50 text-center">
-          Didn't receive the email?
-        </p>
       </div>
     </AuthLayout>
   );
