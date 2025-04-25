@@ -28,6 +28,11 @@ serve(async (req) => {
       redirect_to 
     } = await req.json();
 
+    // Always use email-confirmed as the redirect URL for email verification
+    const finalRedirectTo = email_action_type === 'signup' ? 
+      'https://auth.biblenow.io/email-confirmed' : 
+      redirect_to;
+
     // Render the email template
     const html = await renderAsync(
       React.createElement(MagicLinkEmail, {
@@ -35,7 +40,7 @@ serve(async (req) => {
         token,
         token_hash,
         email_action_type,
-        redirect_to
+        redirect_to: finalRedirectTo
       })
     );
 
