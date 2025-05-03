@@ -24,8 +24,12 @@ const ForgotPassword = () => {
     setIsSubmitting(true);
     
     try {
+      // Use the full URL with the current origin to ensure correct redirection
+      const redirectTo = `${window.location.origin}/update-password`;
+      console.log('Redirect URL:', redirectTo);
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://auth.biblenow.io/update-password',
+        redirectTo
       });
       
       if (error) {
