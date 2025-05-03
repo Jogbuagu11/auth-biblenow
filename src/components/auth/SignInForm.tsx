@@ -1,213 +1,60 @@
-import React, { useState, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
-import ResetPasswordModal from '@/components/auth/ResetPasswordModal';
-import { Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { GoogleIcon, AppleIcon } from '@/components/icons/SocialIcons';
+
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { Button } from '@/components/ui/button';
+import { Loader, Mail, Lock, AlertTriangle } from 'lucide-react';
+import SocialSignIn from '@/components/auth/SocialSignIn';
 
 interface SignInFormProps {
   onToggleForm: () => void;
 }
 
-const SITE_KEY = '8900e0d8-d718-4e6a-9aea-6c565f5e0ea2';
-
 const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showReset, setShowReset] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [isPhoneLogin, setIsPhoneLogin] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HCaptcha>(null);
-  const { toast: uiToast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signIn, error, setError } = useAuth();
   const navigate = useNavigate();
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSubmitting(true);
+    setError(null);
 
     try {
-      if (!captchaToken) {
-        toast.error('Please complete the CAPTCHA');
-        setLoading(false);
-        return;
+      const success = await signIn(email, password);
+      if (success) {
+        toast.success('Sign in successful');
       }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-        options: {
-          captchaToken
-        }
-      });
-
-      captchaRef.current?.resetCaptcha();
-
-      if (error) {
-        toast.error('Login failed', { description: error.message });
-      } else {
-        toast.success('Welcome back!', { description: 'Signed in successfully.' });
-        navigate('/edit-testimony');
-      }
-    } catch (error: any) {
-      toast.error('An unexpected error occurred', { description: error.message });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
-  };
-
-  const handlePhoneSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!phone) {
-      toast.error('Phone number is required');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.signInWithOtp({
-        phone: phone
-      });
-
-      if (error) {
-        toast.error('SMS sign-in failed', { description: error.message });
-      } else {
-        setOtpSent(true);
-        toast.success('OTP code sent', { description: 'Please check your phone for verification code.' });
-      }
-    } catch (error: any) {
-      toast.error('An unexpected error occurred', { description: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        phone: phone,
-        token: otpCode,
-        type: 'sms'
-      });
-
-      if (error) {
-        toast.error('OTP verification failed', { description: error.message });
-      } else {
-        toast.success('Verified successfully!');
-        navigate('/edit-testimony');
-      }
-    } catch (error: any) {
-      toast.error('An unexpected error occurred', { description: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSocialSignIn = async (provider: "google" | "apple") => {
-    try {
-      setLoading(true);
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      // User will be redirected to OAuth provider
-      console.log("Redirecting to OAuth provider:", data);
-    } catch (error: any) {
-      toast.error(`Social sign-in failed`, {
-        description: error.message || "Could not connect to authentication provider"
-      });
-      setLoading(false);
-    }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const switchAuthMode = () => {
-    setIsPhoneLogin(!isPhoneLogin);
-    setOtpSent(false); // Reset OTP state when switching modes
   };
 
   return (
-    <form onSubmit={isPhoneLogin ? (otpSent ? verifyOtp : handlePhoneSignIn) : handleSignIn} className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-semibold text-biblenow-beige">Sign In</h2>
-        <div className="mt-2">
-          <Button 
-            type="button" 
-            variant="ghost" 
-            onClick={switchAuthMode} 
-            className="text-sm text-biblenow-gold hover:text-biblenow-gold/80"
-          >
-            {isPhoneLogin ? "Use Email Instead" : "Use Phone Instead"}
-          </Button>
+    <div>
+      {error && (
+        <div className="bg-red-600/10 border border-red-400/20 rounded-md p-3 mb-5">
+          <div className="flex gap-2 text-red-400">
+            <AlertTriangle className="h-5 w-5" />
+            <p className="text-sm">{error.message}</p>
+          </div>
         </div>
-      </div>
+      )}
 
-      {isPhoneLogin ? (
-        <>
-          {!otpSent ? (
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
-              <input
-                type="tel"
-                placeholder="+1234567890"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="auth-input pl-10"
-                required
-              />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Enter verification code"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  className="auth-input"
-                  required
-                />
-              </div>
-              <p className="text-sm text-biblenow-beige/60">
-                Enter the code sent to {phone}
-              </p>
-            </div>
-          )}
-        </>
-      ) : (
-        <>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div className="relative">
             <Mail className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
             <input
               type="email"
-              placeholder="you@example.com"
+              placeholder="Email"
+              className="auth-input pl-10"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="auth-input pl-10"
               required
             />
           </div>
@@ -216,94 +63,88 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
             <Lock className="absolute left-3 top-3 h-5 w-5 text-biblenow-beige/40" />
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="Password"
+              className="auth-input pl-10"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="auth-input pl-10 pr-10"
               required
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-biblenow-beige/40 hover:text-biblenow-beige"
-              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-3 text-biblenow-beige/60 hover:text-biblenow-beige"
+              onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M10 3C5.5 3 2 7.5 2 10c0 2.5 3.5 7 8 7s8-4.5 8-7c0-2.5-3.5-7-8-7zm0 11c-3.3 0-6-3.7-6-6 0-2.3 2.7-6 6-6s6 3.7 6 6c0 2.3-2.7 6-6 6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M3.28 2.22a.75.75 0 00-1.06 1.06l14.5 14.5a.75.75 0 001.06-1.06l-1.745-1.745a10.029 10.029 0 003.3-4.38 1.651 1.651 0 000-1.185A10.004 10.004 0 009.999 3a9.956 9.956 0 00-4.744 1.194L3.28 2.22zM7.752 6.69l1.092 1.092a2.5 2.5 0 013.374 3.373l1.091 1.092a4 4 0 00-5.557-5.557z"
+                    clipRule="evenodd"
+                  />
+                  <path d="M10.748 13.93l2.523 2.523a9.987 9.987 0 01-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 010-1.186A10.007 10.007 0 012.839 6.02L6.07 9.252a4 4 0 004.678 4.678z" />
+                </svg>
+              )}
             </button>
           </div>
-        </>
-      )}
-
-      {!isPhoneLogin && (
-        <div className="flex justify-between items-center text-sm">
-          <button
-            type="button"
-            onClick={() => setShowReset(true)}
-            className="text-biblenow-gold hover:underline"
-          >
-            Forgot Password?
-          </button>
-          <button
-            type="button"
-            onClick={onToggleForm}
-            className="text-biblenow-gold hover:underline"
-          >
-            Create Account
-          </button>
         </div>
-      )}
 
-      <div className="mt-4">
-        <HCaptcha
-          ref={captchaRef}
-          sitekey={SITE_KEY}
-          onVerify={(token) => {
-            console.log("hCaptcha token received:", token);
-            setCaptchaToken(token);
-          }}
-        />
-      </div>
+        <div className="text-right">
+          <Link to="/forgot-password" className="text-sm auth-link">Forgot password?</Link>
+        </div>
 
-      <button
-        type="submit"
-        className="auth-btn-primary w-full"
-        disabled={loading}
-      >
-        {loading 
-          ? 'Please wait...' 
-          : isPhoneLogin 
-            ? (otpSent ? 'Verify Code' : 'Send Code') 
-            : 'Sign In'
-        }
-      </button>
-
-      <div className="flex items-center my-4">
-        <div className="flex-grow h-px bg-biblenow-beige/20"></div>
-        <span className="mx-2 text-xs text-biblenow-beige/60">or continue with</span>
-        <div className="flex-grow h-px bg-biblenow-beige/20"></div>
-      </div>
-      <div className="flex space-x-2 mb-1">
-        <Button 
-          type="button" 
-          variant="outline" 
-          className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
-          onClick={() => handleSocialSignIn("google")}
-          disabled={loading}
+        <Button
+          type="submit"
+          className="w-full bg-biblenow-gold hover:bg-biblenow-gold-light text-biblenow-brown"
+          disabled={isSubmitting}
         >
-          <GoogleIcon /> Google
+          {isSubmitting ? (
+            <>
+              <Loader className="h-4 w-4 animate-spin mr-2" />
+              Signing In...
+            </>
+          ) : (
+            'Sign In'
+          )}
         </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          className="flex-1 auth-btn-outline flex items-center justify-center gap-2"
-          onClick={() => handleSocialSignIn("apple")}
-          disabled={loading}
-        >
-          <AppleIcon /> Apple
-        </Button>
-      </div>
+      </form>
 
-      <ResetPasswordModal isOpen={showReset} onClose={() => setShowReset(false)} />
-    </form>
+      <div className="mt-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-biblenow-beige/20"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-biblenow-brown-light text-biblenow-beige/70">Or continue with</span>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <SocialSignIn />
+        </div>
+
+        <div className="mt-6 text-center text-sm">
+          <p className="text-biblenow-beige/70">
+            Don't have an account?{' '}
+            <button
+              type="button"
+              onClick={onToggleForm}
+              className="text-biblenow-gold hover:text-biblenow-gold-light"
+            >
+              Create Account
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

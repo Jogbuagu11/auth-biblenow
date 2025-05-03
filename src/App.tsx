@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +11,8 @@ import TwoFactorPrompt from "./components/auth/TwoFactorPrompt";
 import TwoFactorSetup from "./components/auth/TwoFactorSetup";
 import CheckEmail from "./pages/CheckEmail";
 import EmailConfirmed from "./pages/EmailConfirmed";
+import ForgotPassword from "./pages/ForgotPassword";
+import UpdatePassword from "./pages/UpdatePassword";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +30,8 @@ const App = () => (
           <Route path="/auth/setup-2fa" element={<TwoFactorSetup />} />
           <Route path="/check-email" element={<CheckEmail />} />
           <Route path="/email-confirmed" element={<EmailConfirmed />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
