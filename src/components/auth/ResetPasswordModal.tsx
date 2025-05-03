@@ -41,7 +41,7 @@ const ResetPasswordModal = ({ isOpen, onClose }: ResetPasswordModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-biblenow-dark border border-biblenow-beige/20 rounded-lg p-8 max-w-md w-full">
+      <div className="bg-biblenow-dark border border-biblenow-beige/20 rounded-lg p-8 max-w-md w-full shadow-lg">
         <h2 className="text-2xl font-semibold text-biblenow-beige mb-6">Reset Password</h2>
         
         {!isSuccess ? (

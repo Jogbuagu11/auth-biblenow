@@ -215,6 +215,81 @@ export type Database = {
         }
         Relationships: []
       }
+      donation_summary: {
+        Row: {
+          id: string
+          net_earned: number
+          platform_fee: number
+          streamer_id: string | null
+          stripe_fee_estimate: number
+          total_donated: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          net_earned?: number
+          platform_fee?: number
+          streamer_id?: string | null
+          stripe_fee_estimate?: number
+          total_donated?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          net_earned?: number
+          platform_fee?: number
+          streamer_id?: string | null
+          stripe_fee_estimate?: number
+          total_donated?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          donor_id: string | null
+          donor_name: string | null
+          id: string
+          is_anonymous: boolean | null
+          net_amount: number
+          platform_fee: number
+          status: string | null
+          streamer_id: string | null
+          stripe_fee: number
+          stripe_payment_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          donor_id?: string | null
+          donor_name?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          net_amount: number
+          platform_fee: number
+          status?: string | null
+          streamer_id?: string | null
+          stripe_fee: number
+          stripe_payment_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          donor_id?: string | null
+          donor_name?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          net_amount?: number
+          platform_fee?: number
+          status?: string | null
+          streamer_id?: string | null
+          stripe_fee?: number
+          stripe_payment_id?: string | null
+        }
+        Relationships: []
+      }
       email_verification_codes: {
         Row: {
           code: string
@@ -439,34 +514,59 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          embed_url: string | null
           ended_at: string | null
           id: string
           is_live: boolean | null
+          owner_id: string | null
+          platform: string | null
           started_at: string | null
+          stream_key: string | null
+          stream_type: string | null
           streamer_id: string | null
+          thumbnail_url: string | null
           title: string | null
         }
         Insert: {
           created_at?: string | null
           description?: string | null
+          embed_url?: string | null
           ended_at?: string | null
           id?: string
           is_live?: boolean | null
+          owner_id?: string | null
+          platform?: string | null
           started_at?: string | null
+          stream_key?: string | null
+          stream_type?: string | null
           streamer_id?: string | null
+          thumbnail_url?: string | null
           title?: string | null
         }
         Update: {
           created_at?: string | null
           description?: string | null
+          embed_url?: string | null
           ended_at?: string | null
           id?: string
           is_live?: boolean | null
+          owner_id?: string | null
+          platform?: string | null
           started_at?: string | null
+          stream_key?: string | null
+          stream_type?: string | null
           streamer_id?: string | null
+          thumbnail_url?: string | null
           title?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "livestreams_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "livestreams_streamer_id_fkey"
             columns: ["streamer_id"]
@@ -506,52 +606,73 @@ export type Database = {
         }
         Relationships: []
       }
-      notifications: {
+      messages_livestream: {
         Row: {
+          content: string
           created_at: string | null
           id: string
-          post_id: string | null
-          recipient_id: string | null
-          seen: boolean | null
-          sender_id: string | null
-          type: string
+          stream_id: string | null
+          user_id: string | null
         }
         Insert: {
+          content: string
           created_at?: string | null
           id?: string
-          post_id?: string | null
-          recipient_id?: string | null
-          seen?: boolean | null
-          sender_id?: string | null
-          type: string
+          stream_id?: string | null
+          user_id?: string | null
         }
         Update: {
+          content?: string
           created_at?: string | null
           id?: string
-          post_id?: string | null
-          recipient_id?: string | null
-          seen?: boolean | null
-          sender_id?: string | null
-          type?: string
+          stream_id?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "notifications_post_id_fkey"
-            columns: ["post_id"]
+            foreignKeyName: "messages_livestream_stream_id_fkey"
+            columns: ["stream_id"]
             isOneToOne: false
-            referencedRelation: "posts"
+            referencedRelation: "streams"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          metadata: Json | null
+          title: string
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          metadata?: Json | null
+          title: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          metadata?: Json | null
+          title?: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
           {
-            foreignKeyName: "notifications_recipient_id_fkey"
-            columns: ["recipient_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "notifications_sender_id_fkey"
-            columns: ["sender_id"]
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -887,6 +1008,7 @@ export type Database = {
           phone_number_verified: boolean | null
           profile_photo_url: string | null
           state: string | null
+          stripe_account_id: string | null
           subscription_end_date: string | null
           subscription_status: string | null
           updated_at: string | null
@@ -921,6 +1043,7 @@ export type Database = {
           phone_number_verified?: boolean | null
           profile_photo_url?: string | null
           state?: string | null
+          stripe_account_id?: string | null
           subscription_end_date?: string | null
           subscription_status?: string | null
           updated_at?: string | null
@@ -955,6 +1078,7 @@ export type Database = {
           phone_number_verified?: boolean | null
           profile_photo_url?: string | null
           state?: string | null
+          stripe_account_id?: string | null
           subscription_end_date?: string | null
           subscription_status?: string | null
           updated_at?: string | null
@@ -1283,6 +1407,81 @@ export type Database = {
         }
         Relationships: []
       }
+      streamer_viewer_invites: {
+        Row: {
+          accepted: boolean | null
+          accepted_at: string | null
+          id: string
+          sent_at: string | null
+          stream_id: string | null
+          streamer_id: string | null
+          viewer_email: string
+        }
+        Insert: {
+          accepted?: boolean | null
+          accepted_at?: string | null
+          id?: string
+          sent_at?: string | null
+          stream_id?: string | null
+          streamer_id?: string | null
+          viewer_email: string
+        }
+        Update: {
+          accepted?: boolean | null
+          accepted_at?: string | null
+          id?: string
+          sent_at?: string | null
+          stream_id?: string | null
+          streamer_id?: string | null
+          viewer_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streamer_viewer_invites_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "livestreams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "streamer_viewer_invites_streamer_id_fkey"
+            columns: ["streamer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      streams: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_live: boolean | null
+          stream_url: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_live?: boolean | null
+          stream_url: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_live?: boolean | null
+          stream_url?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       strongs: {
         Row: {
           description: string | null
@@ -1457,6 +1656,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_invites: {
+        Row: {
+          accepted: boolean | null
+          accepted_at: string | null
+          id: string
+          invitee_email: string
+          inviter_id: string | null
+          sent_at: string | null
+        }
+        Insert: {
+          accepted?: boolean | null
+          accepted_at?: string | null
+          id?: string
+          invitee_email: string
+          inviter_id?: string | null
+          sent_at?: string | null
+        }
+        Update: {
+          accepted?: boolean | null
+          accepted_at?: string | null
+          id?: string
+          invitee_email?: string
+          inviter_id?: string | null
+          sent_at?: string | null
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           audiospeed: number | null
@@ -1531,6 +1757,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      verified_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          stripe_account_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          stripe_account_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          stripe_account_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verified_users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       "websters-1828": {
         Row: {
