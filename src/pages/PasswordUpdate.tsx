@@ -7,50 +7,14 @@ import AuthLayout from '@/components/AuthLayout';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Loader } from 'lucide-react';
 
-const UpdatePassword = () => {
+const PasswordUpdate = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState('');
-  const [isCheckingToken, setIsCheckingToken] = useState(true);
   const navigate = useNavigate();
-
-  // Check if URL has hash fragment from Supabase (verification token)
-  useEffect(() => {
-    const checkToken = async () => {
-      try {
-        setIsCheckingToken(true);
-        
-        // Get the hash parameters from the URL
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = hashParams.get('access_token');
-        
-        if (!accessToken) {
-          console.error('No access_token found in URL hash');
-          navigate('/expired-reset');
-          return;
-        }
-        
-        // Check if the token is valid by getting the user
-        const { data, error } = await supabase.auth.getUser(accessToken);
-        
-        if (error || !data.user) {
-          console.error('Invalid token:', error?.message || 'User not found');
-          navigate('/expired-reset');
-        } else {
-          console.log('Valid token, user found:', data.user.email);
-          setIsCheckingToken(false);
-        }
-      } catch (err) {
-        console.error('Error checking token:', err);
-        navigate('/expired-reset');
-      }
-    };
-
-    checkToken();
-  }, [navigate]);
 
   // Check password strength
   useEffect(() => {
@@ -91,6 +55,16 @@ const UpdatePassword = () => {
     setIsSubmitting(true);
     
     try {
+      // Get the hash parameters from the URL
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      
+      if (!accessToken) {
+        toast.error('Missing access token', { description: 'Please use a valid password reset link.' });
+        setIsSubmitting(false);
+        return;
+      }
+      
       const { error } = await supabase.auth.updateUser({ password });
       
       if (error) {
@@ -120,18 +94,6 @@ const UpdatePassword = () => {
     if (passwordStrength === 'strong') return 'bg-green-500';
     return 'bg-biblenow-beige/10';
   };
-  
-  // Show loading state while checking token
-  if (isCheckingToken) {
-    return (
-      <AuthLayout>
-        <div className="flex flex-col items-center justify-center h-40">
-          <Loader className="h-8 w-8 animate-spin text-biblenow-gold" />
-          <p className="text-biblenow-beige/80 mt-4">Verifying your reset link...</p>
-        </div>
-      </AuthLayout>
-    );
-  }
   
   return (
     <AuthLayout>
@@ -238,4 +200,4 @@ const UpdatePassword = () => {
   );
 };
 
-export default UpdatePassword;
+export default PasswordUpdate;

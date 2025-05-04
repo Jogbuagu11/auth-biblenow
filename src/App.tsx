@@ -12,7 +12,7 @@ import TwoFactorSetup from "./components/auth/TwoFactorSetup";
 import CheckEmail from "./pages/CheckEmail";
 import EmailConfirmed from "./pages/EmailConfirmed";
 import ForgotPassword from "./pages/ForgotPassword";
-import UpdatePassword from "./pages/UpdatePassword";
+import PasswordUpdate from "./pages/PasswordUpdate";
 import ExpiredReset from "./pages/ExpiredReset";
 
 const queryClient = new QueryClient();
@@ -32,7 +32,8 @@ const App = () => (
           <Route path="/check-email" element={<CheckEmail />} />
           <Route path="/email-confirmed" element={<EmailConfirmed />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/password-update" element={<PasswordUpdate />} />
+          <Route path="/update-password" element={<Navigate to="/password-update" replace />} />
           <Route path="/expired-reset" element={<ExpiredReset />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
