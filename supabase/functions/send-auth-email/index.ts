@@ -28,10 +28,21 @@ serve(async (req) => {
       redirect_to 
     } = await req.json();
 
-    // Always use email-confirmed as the redirect URL for email verification
-    const finalRedirectTo = email_action_type === 'signup' ? 
-      'https://auth.biblenow.io/email-confirmed' : 
-      redirect_to;
+    // Determine the correct redirection URL based on action type
+    let finalRedirectTo;
+    
+    if (email_action_type === 'signup') {
+      // For signup, always use email-confirmed path
+      finalRedirectTo = 'https://auth.biblenow.io/email-confirmed';
+    } else if (email_action_type === 'recovery') {
+      // For password recovery, always use password-update path
+      finalRedirectTo = 'https://auth.biblenow.io/password-update';
+    } else {
+      // For other actions, use the provided redirect_to
+      finalRedirectTo = redirect_to;
+    }
+
+    console.log(`Processing ${email_action_type} for ${email}, redirecting to ${finalRedirectTo}`);
 
     // Render the email template
     const html = await renderAsync(

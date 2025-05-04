@@ -1,3 +1,4 @@
+
 import {
   Body,
   Container,
@@ -24,52 +25,62 @@ export const MagicLinkEmail = ({
   email_action_type,
   redirect_to,
   token_hash,
-}: MagicLinkEmailProps) => (
-  <Html>
-    <Head />
-    <Preview>Log in with this magic link</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>BibleNOW Authentication</Heading>
-        <Link
-          href={`${supabase_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=https://auth.biblenow.io/email-confirmed`}
-          target="_blank"
-          style={{
-            ...link,
-            display: 'block',
-            marginBottom: '16px',
-          }}
-        >
-          Click here to log in with this magic link
-        </Link>
-        <Text style={{ ...text, marginBottom: '14px' }}>
-          Or, copy and paste this temporary login code:
-        </Text>
-        <code style={code}>{token}</code>
-        <Text
-          style={{
-            ...text,
-            color: '#ababab',
-            marginTop: '14px',
-            marginBottom: '16px',
-          }}
-        >
-          If you didn&apos;t try to login, you can safely ignore this email.
-        </Text>
-        <Text style={footer}>
+}: MagicLinkEmailProps) => {
+  // Determine the correct redirection URL based on action type
+  // For password recovery, make sure to use password-update path
+  const finalRedirectTo = email_action_type === 'signup' 
+    ? 'https://auth.biblenow.io/email-confirmed' 
+    : email_action_type === 'recovery'
+    ? 'https://auth.biblenow.io/password-update'
+    : redirect_to;
+
+  return (
+    <Html>
+      <Head />
+      <Preview>Log in with this magic link</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Heading style={h1}>BibleNOW Authentication</Heading>
           <Link
-            href="https://biblenow.io"
+            href={`${supabase_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${finalRedirectTo}`}
             target="_blank"
-            style={{ ...link, color: '#898989' }}
+            style={{
+              ...link,
+              display: 'block',
+              marginBottom: '16px',
+            }}
           >
-            BibleNOW
+            Click here to log in with this magic link
           </Link>
-          , your spiritual companion.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
+          <Text style={{ ...text, marginBottom: '14px' }}>
+            Or, copy and paste this temporary login code:
+          </Text>
+          <code style={code}>{token}</code>
+          <Text
+            style={{
+              ...text,
+              color: '#ababab',
+              marginTop: '14px',
+              marginBottom: '16px',
+            }}
+          >
+            If you didn&apos;t try to login, you can safely ignore this email.
+          </Text>
+          <Text style={footer}>
+            <Link
+              href="https://biblenow.io"
+              target="_blank"
+              style={{ ...link, color: '#898989' }}
+            >
+              BibleNOW
+            </Link>
+            , your spiritual companion.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+};
 
 export default MagicLinkEmail
 
