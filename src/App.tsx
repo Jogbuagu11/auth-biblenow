@@ -33,7 +33,6 @@ const App = () => (
           <Route path="/email-confirmed" element={<EmailConfirmed />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/password-update" element={<PasswordUpdate />} />
-          <Route path="/update-password" element={<Navigate to="/password-update" replace />} />
           <Route path="/expired-reset" element={<ExpiredReset />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
