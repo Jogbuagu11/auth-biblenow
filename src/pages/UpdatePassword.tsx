@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,7 +13,6 @@ const UpdatePassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState('');
-  const [hasValidToken, setHasValidToken] = useState(false);
   const [isCheckingToken, setIsCheckingToken] = useState(true);
   const navigate = useNavigate();
 
@@ -30,7 +28,7 @@ const UpdatePassword = () => {
         
         if (!accessToken) {
           console.error('No access_token found in URL hash');
-          setHasValidToken(false);
+          navigate('/expired-reset');
           return;
         }
         
@@ -39,21 +37,19 @@ const UpdatePassword = () => {
         
         if (error || !data.user) {
           console.error('Invalid token:', error?.message || 'User not found');
-          setHasValidToken(false);
+          navigate('/expired-reset');
         } else {
           console.log('Valid token, user found:', data.user.email);
-          setHasValidToken(true);
+          setIsCheckingToken(false);
         }
       } catch (err) {
         console.error('Error checking token:', err);
-        setHasValidToken(false);
-      } finally {
-        setIsCheckingToken(false);
+        navigate('/expired-reset');
       }
     };
 
     checkToken();
-  }, []);
+  }, [navigate]);
 
   // Check password strength
   useEffect(() => {
@@ -123,37 +119,6 @@ const UpdatePassword = () => {
     if (passwordStrength === 'strong') return 'bg-green-500';
     return 'bg-biblenow-beige/10';
   };
-  
-  // Show error state if token is invalid
-  if (!isCheckingToken && !hasValidToken) {
-    return (
-      <AuthLayout>
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-serif font-bold text-biblenow-gold">Invalid or expired reset link</h1>
-          <p className="text-biblenow-beige/80 mt-4">
-            Please request a new password reset link.
-          </p>
-        </div>
-        
-        <div className="mt-6 space-y-4">
-          <Button
-            className="w-full bg-biblenow-gold hover:bg-biblenow-gold-light text-biblenow-brown"
-            onClick={() => navigate('/forgot-password')}
-          >
-            Request New Link
-          </Button>
-          
-          <Button
-            variant="outline"
-            className="w-full border-biblenow-beige/20 text-biblenow-beige hover:bg-biblenow-brown-light"
-            onClick={() => navigate('/login')}
-          >
-            Back to Sign In
-          </Button>
-        </div>
-      </AuthLayout>
-    );
-  }
   
   // Show loading state while checking token
   if (isCheckingToken) {
