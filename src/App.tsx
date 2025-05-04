@@ -12,7 +12,6 @@ import TwoFactorSetup from "./components/auth/TwoFactorSetup";
 import CheckEmail from "./pages/CheckEmail";
 import EmailConfirmed from "./pages/EmailConfirmed";
 import ForgotPassword from "./pages/ForgotPassword";
-import PasswordReset from "./pages/PasswordReset";
 import PasswordUpdate from "./pages/PasswordUpdate";
 import ExpiredReset from "./pages/ExpiredReset";
 

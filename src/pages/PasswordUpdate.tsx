@@ -14,7 +14,42 @@ const PasswordUpdate = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState('');
+  const [tokensFound, setTokensFound] = useState(false);
   const navigate = useNavigate();
+
+  // Extract tokens from hash on component mount
+  useEffect(() => {
+    const parseHashParams = () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      
+      if (accessToken && refreshToken) {
+        // Set the session with the tokens
+        try {
+          (supabase.auth.setSession as any)({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          setTokensFound(true);
+          console.log('Auth session set with tokens from URL hash');
+        } catch (error: any) {
+          console.error('Error setting auth session:', error);
+          toast.error('Authentication error', { 
+            description: 'Failed to set authentication session. Please try again.' 
+          });
+        }
+      } else if (window.location.hash) {
+        // Hash exists but doesn't contain valid tokens
+        toast.error('Invalid reset link', { 
+          description: 'The password reset link is missing required authentication tokens.' 
+        });
+        setTimeout(() => navigate('/forgot-password'), 2000);
+      }
+    };
+
+    parseHashParams();
+  }, [navigate]);
 
   // Check password strength
   useEffect(() => {
@@ -55,16 +90,7 @@ const PasswordUpdate = () => {
     setIsSubmitting(true);
     
     try {
-      // Get the hash parameters from the URL
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      
-      if (!accessToken) {
-        toast.error('Missing access token', { description: 'Please use a valid password reset link.' });
-        setIsSubmitting(false);
-        return;
-      }
-      
+      // Update the password
       const { error } = await supabase.auth.updateUser({ password });
       
       if (error) {
