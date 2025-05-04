@@ -148,7 +148,7 @@ export const useApi = () => {
       console.log("Requesting password reset for:", email);
       
       const { data, error } = await supabase.functions.invoke('password-reset-request', {
-        body: { email },
+        body: { email, redirectUrl: `${window.location.origin}/password-update` },
         headers: {
           'Content-Type': 'application/json',
         },
