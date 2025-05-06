@@ -8,8 +8,16 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
-  const location = useLocation();
-  const redirectTo = new URLSearchParams(location.search).get('redirectTo') || '';
+  // Check if we're in a router context before using useLocation
+  let redirectTo = '';
+  
+  try {
+    const location = useLocation();
+    redirectTo = new URLSearchParams(location.search).get('redirectTo') || '';
+  } catch (error) {
+    // If useLocation fails, we're not in a router context
+    console.log('Not in a router context, skipping redirectTo parsing');
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
