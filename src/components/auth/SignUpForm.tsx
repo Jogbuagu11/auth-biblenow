@@ -82,7 +82,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
             gender,
             birthdate: format(birthdate, 'yyyy-MM-dd'),
           },
-          emailRedirectTo: 'https://social.biblenow.io/edit-testimony',
+          emailRedirectTo: 'https://auth.biblenow.io/email-confirmed',
         }
       });
 
