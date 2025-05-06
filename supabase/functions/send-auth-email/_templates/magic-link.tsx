@@ -27,7 +27,7 @@ export const MagicLinkEmail = ({
   token_hash,
 }: MagicLinkEmailProps) => {
   // Determine the correct redirection URL based on action type
-  // For password recovery, make sure to use password-update path
+  // For signup, always use email-confirmed path
   const finalRedirectTo = email_action_type === 'signup' 
     ? 'https://auth.biblenow.io/email-confirmed' 
     : email_action_type === 'recovery'
