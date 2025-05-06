@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, RefreshCcw, XCircle } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 const VerifyTwoFactor: React.FC = () => {
   const [code, setCode] = useState('');
@@ -147,6 +148,22 @@ const VerifyTwoFactor: React.FC = () => {
     }
   };
 
+  const formatMaskedPhone = (phone: string) => {
+    if (!phone || phone.length < 10) return '';
+    return `(***) ***-${phone.slice(-4)}`;
+  };
+
+  if (loading && !verified) {
+    return (
+      <div className="max-w-md w-full mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-center">
+        <div className="flex flex-col items-center justify-center space-y-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <p className="text-gray-600">Verifying your code...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md w-full mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
       {verified ? (
@@ -159,9 +176,10 @@ const VerifyTwoFactor: React.FC = () => {
       ) : (
         <>
           <h2 className="text-xl font-bold mb-4">Verify Your Phone</h2>
-          <p className="mb-4 text-gray-600">
-            Enter the 6-digit verification code sent to your phone.
+          <p className="mb-1 text-gray-600">
+            Enter the 6-digit verification code sent to:
           </p>
+          <p className="mb-4 font-medium">{formatMaskedPhone(phoneNumber)}</p>
           
           {error && (
             <Alert variant="destructive" className="mb-4">
@@ -171,19 +189,26 @@ const VerifyTwoFactor: React.FC = () => {
             </Alert>
           )}
           
-          <Input
-            type="text"
-            inputMode="numeric"
-            maxLength={6}
-            placeholder="123456"
-            className="text-center text-xl tracking-widest mb-4"
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, ''))}
-          />
+          <div className="mb-6">
+            <InputOTP maxLength={6} value={code} onChange={setCode}>
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
           
           <div className="space-y-2">
-            <Button className="w-full" onClick={verifyCode} disabled={loading}>
-              {loading ? 'Verifying...' : 'Verify Code'}
+            <Button 
+              className="w-full bg-amber-600 hover:bg-amber-700" 
+              onClick={verifyCode} 
+              disabled={loading || code.length !== 6}
+            >
+              Verify Code
             </Button>
             
             <Button 
@@ -203,6 +228,10 @@ const VerifyTwoFactor: React.FC = () => {
                 </>
               )}
             </Button>
+            
+            <p className="text-xs text-center text-gray-500 mt-4">
+              Didn't receive a code? Check that the phone number is correct or try requesting a new code.
+            </p>
           </div>
         </>
       )}
