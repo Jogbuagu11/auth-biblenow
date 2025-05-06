@@ -1,83 +1,109 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { Shield, ShieldAlert } from 'lucide-react';
 
 const TwoFactorPrompt: React.FC = () => {
   const navigate = useNavigate();
-  
-  const handleSetup2FA = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is logged in and if 2FA is already set up
+    const checkUserStatus = async () => {
+      const { data } = await supabase.auth.getSession();
+      
+      if (!data.session) {
+        // No session, redirect to login
+        navigate('/login');
+        return;
+      }
+      
+      // Check if 2FA is already enabled
+      const twoFaEnabled = data.session.user?.user_metadata?.twofa_enabled;
+      const twoFaSkipped = data.session.user?.user_metadata?.twofa_skipped;
+      
+      if (twoFaEnabled) {
+        // 2FA already enabled, redirect to main app
+        window.location.href = 'https://social.biblenow.io/edit-testimony';
+        return;
+      } else if (twoFaSkipped) {
+        // 2FA was skipped, redirect to main app
+        window.location.href = 'https://social.biblenow.io/edit-testimony';
+        return;
+      }
+      
+      setLoading(false);
+    };
+    
+    checkUserStatus();
+  }, [navigate]);
+
+  const handleSetup = () => {
     navigate('/auth/setup-2fa');
   };
-  
-  const handleSkip2FA = async () => {
+
+  const handleSkip = async () => {
+    setLoading(true);
+    
     try {
       const { error } = await supabase.auth.updateUser({
         data: { twofa_skipped: true }
       });
       
       if (error) {
-        toast.error('Error updating user preferences', {
-          description: error.message
-        });
+        console.error('Error updating user:', error);
+        setLoading(false);
         return;
       }
       
-      toast.success('Preference saved', {
-        description: 'You can enable 2FA anytime in your account settings'
-      });
-      
-      // Redirect to edit testimony page
       window.location.href = 'https://social.biblenow.io/edit-testimony';
-    } catch (err: any) {
-      toast.error('An error occurred', {
-        description: err.message
-      });
+    } catch (err) {
+      console.error('Error skipping 2FA:', err);
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
+
   return (
-    <div className="w-full max-w-md p-6 mx-auto bg-white rounded-lg shadow-md">
-      <div className="flex flex-col items-center mb-6">
-        <div className="w-16 h-16 flex items-center justify-center rounded-full bg-biblenow-gold/10 text-biblenow-gold mb-4">
-          <ShieldAlert size={32} />
-        </div>
-        <h2 className="text-2xl font-serif font-semibold text-biblenow-brown text-center">
-          Protect Your Account
-        </h2>
-        <p className="text-center text-biblenow-brown/80 mt-2">
-          Add an extra layer of security to your BibleNOW account with Two-Factor Authentication.
-        </p>
-      </div>
-      
-      <div className="bg-biblenow-beige/30 p-4 rounded-md mb-6 border border-biblenow-gold/20">
-        <div className="flex items-start">
-          <Shield className="text-biblenow-gold mt-1 mr-3 flex-shrink-0" size={20} />
-          <p className="text-sm text-biblenow-brown">
-            Two-Factor Authentication requires a verification code when you sign in, 
-            keeping your account secure even if your password is compromised.
+    <div className="flex items-center justify-center min-h-[80vh]">
+      <Card className="w-[380px]">
+        <CardHeader className="space-y-1">
+          <div className="flex justify-center mb-4">
+            <Shield className="h-12 w-12 text-biblebrown-600" />
+          </div>
+          <CardTitle className="text-2xl text-center">Two-Factor Authentication</CardTitle>
+          <CardDescription className="text-center">
+            Add an extra layer of security to your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to sign in.
           </p>
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <Button 
-          onClick={handleSetup2FA} 
-          className="w-full bg-biblenow-gold hover:bg-biblenow-gold/80 text-white"
-        >
-          Set Up 2FA Now
-        </Button>
-        <Button 
-          onClick={handleSkip2FA} 
-          variant="outline" 
-          className="w-full border-biblenow-gold/30 text-white hover:bg-biblenow-gold/10"
-        >
-          Remind Me Later
-        </Button>
-      </div>
+          <div className="rounded-lg bg-biblebrown-50 p-3">
+            <h3 className="font-medium text-biblebrown-900 mb-1">Why use 2FA?</h3>
+            <ul className="list-disc pl-5 text-sm text-biblebrown-700 space-y-1">
+              <li>Protect your account from unauthorized access</li>
+              <li>Verify your identity using your phone</li>
+              <li>Prevent others from accessing your personal information</li>
+            </ul>
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2">
+          <Button className="w-full" onClick={handleSetup}>
+            Set Up Two-Factor Authentication
+          </Button>
+          <Button variant="outline" className="w-full" onClick={handleSkip}>
+            Skip for Now
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

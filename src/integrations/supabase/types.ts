@@ -9,6 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_logs: {
+        Row: {
+          action: string
+          admin_email: string
+          admin_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          admin_email: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          admin_email?: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
+      admin_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          last_login: string | null
+          role: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name: string
+          id: string
+          last_login?: string | null
+          role?: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          last_login?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
       audio_playlists: {
         Row: {
           created_at: string | null
@@ -316,6 +376,77 @@ export type Database = {
           used?: boolean
         }
         Relationships: []
+      }
+      flag_reasons: {
+        Row: {
+          full_verse: string
+          id: number
+          key: string
+          label: string
+          scripture_reference: string
+        }
+        Insert: {
+          full_verse: string
+          id?: number
+          key: string
+          label: string
+          scripture_reference: string
+        }
+        Update: {
+          full_verse?: string
+          id?: number
+          key?: string
+          label?: string
+          scripture_reference?: string
+        }
+        Relationships: []
+      }
+      flagged_content: {
+        Row: {
+          content_id: string
+          content_type: string
+          custom_reason: string | null
+          flagged_at: string | null
+          id: string
+          reason_key: string | null
+          report_url: string | null
+          reported_by: string | null
+          resolved_at: string | null
+          status: string | null
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          custom_reason?: string | null
+          flagged_at?: string | null
+          id?: string
+          reason_key?: string | null
+          report_url?: string | null
+          reported_by?: string | null
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          custom_reason?: string | null
+          flagged_at?: string | null
+          id?: string
+          reason_key?: string | null
+          report_url?: string | null
+          reported_by?: string | null
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flagged_content_reason_key_fkey"
+            columns: ["reason_key"]
+            isOneToOne: false
+            referencedRelation: "flag_reasons"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       game_preferences: {
         Row: {
@@ -992,8 +1123,10 @@ export type Database = {
           created_at: string | null
           date_saved: string | null
           denomination: string | null
+          donations_enabled: boolean | null
           email: string | null
           first_name: string | null
+          full_name: string | null
           gender: string | null
           has_completed_2fa: boolean | null
           has_completed_profile: boolean | null
@@ -1002,15 +1135,21 @@ export type Database = {
           is_verified: boolean | null
           last_name: string | null
           location: string | null
+          ministry_name: string | null
           name: string | null
           phone: string | null
           phone_number: string | null
           phone_number_verified: boolean | null
           profile_photo_url: string | null
+          shekel_balance: number
           state: string | null
           stripe_account_id: string | null
+          stripe_customer_id: string | null
           subscription_end_date: string | null
+          subscription_expires_at: string | null
+          subscription_plan: string | null
           subscription_status: string | null
+          subscription_tier: string | null
           updated_at: string | null
           username: string | null
           years_saved_category: string | null
@@ -1027,8 +1166,10 @@ export type Database = {
           created_at?: string | null
           date_saved?: string | null
           denomination?: string | null
+          donations_enabled?: boolean | null
           email?: string | null
           first_name?: string | null
+          full_name?: string | null
           gender?: string | null
           has_completed_2fa?: boolean | null
           has_completed_profile?: boolean | null
@@ -1037,15 +1178,21 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           location?: string | null
+          ministry_name?: string | null
           name?: string | null
           phone?: string | null
           phone_number?: string | null
           phone_number_verified?: boolean | null
           profile_photo_url?: string | null
+          shekel_balance?: number
           state?: string | null
           stripe_account_id?: string | null
+          stripe_customer_id?: string | null
           subscription_end_date?: string | null
+          subscription_expires_at?: string | null
+          subscription_plan?: string | null
           subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string | null
           username?: string | null
           years_saved_category?: string | null
@@ -1062,8 +1209,10 @@ export type Database = {
           created_at?: string | null
           date_saved?: string | null
           denomination?: string | null
+          donations_enabled?: boolean | null
           email?: string | null
           first_name?: string | null
+          full_name?: string | null
           gender?: string | null
           has_completed_2fa?: boolean | null
           has_completed_profile?: boolean | null
@@ -1072,15 +1221,21 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           location?: string | null
+          ministry_name?: string | null
           name?: string | null
           phone?: string | null
           phone_number?: string | null
           phone_number_verified?: boolean | null
           profile_photo_url?: string | null
+          shekel_balance?: number
           state?: string | null
           stripe_account_id?: string | null
+          stripe_customer_id?: string | null
           subscription_end_date?: string | null
+          subscription_expires_at?: string | null
+          subscription_plan?: string | null
           subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string | null
           username?: string | null
           years_saved_category?: string | null
@@ -1350,6 +1505,66 @@ export type Database = {
           },
         ]
       }
+      shekel_packs: {
+        Row: {
+          base_amount: number
+          bonus_amount: number | null
+          created_at: string | null
+          id: string
+          price_usd: number
+          stripe_product_id: string | null
+          tier_name: string
+          total_amount: number | null
+        }
+        Insert: {
+          base_amount: number
+          bonus_amount?: number | null
+          created_at?: string | null
+          id?: string
+          price_usd: number
+          stripe_product_id?: string | null
+          tier_name: string
+          total_amount?: number | null
+        }
+        Update: {
+          base_amount?: number
+          bonus_amount?: number | null
+          created_at?: string | null
+          id?: string
+          price_usd?: number
+          stripe_product_id?: string | null
+          tier_name?: string
+          total_amount?: number | null
+        }
+        Relationships: []
+      }
+      shekel_transactions: {
+        Row: {
+          amount: number
+          course_id: string
+          created_at: string
+          id: string
+          instructor_id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          course_id: string
+          created_at?: string
+          id?: string
+          instructor_id: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          course_id?: string
+          created_at?: string
+          id?: string
+          instructor_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       signin_logs: {
         Row: {
           email: string | null
@@ -1456,7 +1671,9 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          flag_count: number | null
           id: string
+          is_hidden: boolean | null
           is_live: boolean | null
           stream_url: string
           title: string
@@ -1465,7 +1682,9 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description?: string | null
+          flag_count?: number | null
           id?: string
+          is_hidden?: boolean | null
           is_live?: boolean | null
           stream_url: string
           title: string
@@ -1474,7 +1693,9 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string | null
+          flag_count?: number | null
           id?: string
+          is_hidden?: boolean | null
           is_live?: boolean | null
           stream_url?: string
           title?: string
@@ -1521,6 +1742,33 @@ export type Database = {
           created_at?: string | null
           event_data?: string | null
           id?: number
+        }
+        Relationships: []
+      }
+      subscription_tiers: {
+        Row: {
+          created_at: string
+          features: Json | null
+          id: string
+          name: string
+          price: number
+          stripe_price_id: string
+        }
+        Insert: {
+          created_at?: string
+          features?: Json | null
+          id?: string
+          name: string
+          price: number
+          stripe_price_id: string
+        }
+        Update: {
+          created_at?: string
+          features?: Json | null
+          id?: string
+          name?: string
+          price?: number
+          stripe_price_id?: string
         }
         Relationships: []
       }
@@ -1758,6 +2006,51 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_requests: {
+        Row: {
+          email: string | null
+          full_name: string | null
+          has_ministry_experience: boolean
+          id: string
+          requested_at: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          stripe_identity_session_id: string | null
+          stripe_identity_status: string | null
+          user_id: string
+        }
+        Insert: {
+          email?: string | null
+          full_name?: string | null
+          has_ministry_experience: boolean
+          id?: string
+          requested_at?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          stripe_identity_session_id?: string | null
+          stripe_identity_status?: string | null
+          user_id: string
+        }
+        Update: {
+          email?: string | null
+          full_name?: string | null
+          has_ministry_experience?: boolean
+          id?: string
+          requested_at?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          stripe_identity_session_id?: string | null
+          stripe_identity_status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       verified_users: {
         Row: {
           created_at: string | null
@@ -1807,7 +2100,14 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      flagged_content_counts: {
+        Row: {
+          content_id: string | null
+          content_type: string | null
+          flag_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       apple_subscription_webhook: {
