@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, RefreshCcw, XCircle } from 'lucide-react';
+import { useApi } from '@/hooks/useApi';
 
 const VerifyTwoFactor: React.FC = () => {
   const [code, setCode] = useState('');
@@ -17,6 +18,7 @@ const VerifyTwoFactor: React.FC = () => {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const api = useApi();
 
   useEffect(() => {
     // Get stored data from session storage
@@ -53,8 +55,14 @@ const VerifyTwoFactor: React.FC = () => {
         return;
       }
 
-      // Check if the code matches the expected code
-      if (code !== expectedCode) {
+      // Call the verify-2fa-code edge function
+      const { data, error: verifyError } = await api.verify2FACode(
+        user.id, 
+        code,
+        expectedCode
+      );
+
+      if (verifyError || !data?.verified) {
         setError('Invalid verification code');
         setLoading(false);
         return;
