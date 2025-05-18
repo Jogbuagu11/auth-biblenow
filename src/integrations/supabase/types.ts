@@ -19,6 +19,7 @@ export type Database = {
           id: string
           target_id: string | null
           target_type: string | null
+          user_id: string | null
         }
         Insert: {
           action: string
@@ -29,6 +30,7 @@ export type Database = {
           id?: string
           target_id?: string | null
           target_type?: string | null
+          user_id?: string | null
         }
         Update: {
           action?: string
@@ -39,6 +41,7 @@ export type Database = {
           id?: string
           target_id?: string | null
           target_type?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -66,6 +69,36 @@ export type Database = {
           id?: string
           last_login?: string | null
           role?: string
+        }
+        Relationships: []
+      }
+      anonymous_invites: {
+        Row: {
+          id: string
+          invite_status: string | null
+          ip_address: string | null
+          message: string | null
+          recipient_email: string
+          sender_name: string | null
+          sent_at: string | null
+        }
+        Insert: {
+          id?: string
+          invite_status?: string | null
+          ip_address?: string | null
+          message?: string | null
+          recipient_email: string
+          sender_name?: string | null
+          sent_at?: string | null
+        }
+        Update: {
+          id?: string
+          invite_status?: string | null
+          ip_address?: string | null
+          message?: string | null
+          recipient_email?: string
+          sender_name?: string | null
+          sent_at?: string | null
         }
         Relationships: []
       }
@@ -523,6 +556,7 @@ export type Database = {
           group_id: string | null
           id: string
           sender_id: string | null
+          user_id: string | null
         }
         Insert: {
           content: string
@@ -530,6 +564,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           sender_id?: string | null
+          user_id?: string | null
         }
         Update: {
           content?: string
@@ -537,6 +572,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           sender_id?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -561,18 +597,21 @@ export type Database = {
           id: string
           is_private: boolean
           title: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
           is_private?: boolean
           title: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
           is_private?: boolean
           title?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -818,6 +857,7 @@ export type Database = {
           ip_address: string | null
           requested_at: string | null
           user_agent: string | null
+          user_id: string | null
         }
         Insert: {
           completed_at?: string | null
@@ -826,6 +866,7 @@ export type Database = {
           ip_address?: string | null
           requested_at?: string | null
           user_agent?: string | null
+          user_id?: string | null
         }
         Update: {
           completed_at?: string | null
@@ -834,6 +875,7 @@ export type Database = {
           ip_address?: string | null
           requested_at?: string | null
           user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -848,6 +890,7 @@ export type Database = {
           post_id: string | null
           scripture_ref: string | null
           type: string | null
+          user_id: string | null
         }
         Insert: {
           audio_url?: string | null
@@ -859,6 +902,7 @@ export type Database = {
           post_id?: string | null
           scripture_ref?: string | null
           type?: string | null
+          user_id?: string | null
         }
         Update: {
           audio_url?: string | null
@@ -870,6 +914,7 @@ export type Database = {
           post_id?: string | null
           scripture_ref?: string | null
           type?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1334,6 +1379,7 @@ export type Database = {
           is_public: boolean | null
           start_date: string
           title: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -1343,6 +1389,7 @@ export type Database = {
           is_public?: boolean | null
           start_date: string
           title: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -1352,6 +1399,7 @@ export type Database = {
           is_public?: boolean | null
           start_date?: string
           title?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1368,16 +1416,19 @@ export type Database = {
           id: string
           saved_post_id: string | null
           tag: string | null
+          user_id: string | null
         }
         Insert: {
           id?: string
           saved_post_id?: string | null
           tag?: string | null
+          user_id?: string | null
         }
         Update: {
           id?: string
           saved_post_id?: string | null
           tag?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1455,6 +1506,7 @@ export type Database = {
           subject: string | null
           to_email: string
           type: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -1464,6 +1516,7 @@ export type Database = {
           subject?: string | null
           to_email: string
           type?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -1473,6 +1526,7 @@ export type Database = {
           subject?: string | null
           to_email?: string
           type?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1515,6 +1569,7 @@ export type Database = {
           stripe_product_id: string | null
           tier_name: string
           total_amount: number | null
+          user_id: string | null
         }
         Insert: {
           base_amount: number
@@ -1525,6 +1580,7 @@ export type Database = {
           stripe_product_id?: string | null
           tier_name: string
           total_amount?: number | null
+          user_id?: string | null
         }
         Update: {
           base_amount?: number
@@ -1535,6 +1591,7 @@ export type Database = {
           stripe_product_id?: string | null
           tier_name?: string
           total_amount?: number | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1622,6 +1679,61 @@ export type Database = {
         }
         Relationships: []
       }
+      stream_sessions: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          ended_at: string | null
+          host_id: string | null
+          id: string
+          started_at: string
+          stream_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          host_id?: string | null
+          id?: string
+          started_at?: string
+          stream_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          host_id?: string | null
+          id?: string
+          started_at?: string
+          stream_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_session_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stream_sessions_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stream_sessions_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       streamer_viewer_invites: {
         Row: {
           accepted: boolean | null
@@ -1630,6 +1742,7 @@ export type Database = {
           sent_at: string | null
           stream_id: string | null
           streamer_id: string | null
+          user_id: string | null
           viewer_email: string
         }
         Insert: {
@@ -1639,6 +1752,7 @@ export type Database = {
           sent_at?: string | null
           stream_id?: string | null
           streamer_id?: string | null
+          user_id?: string | null
           viewer_email: string
         }
         Update: {
@@ -1648,6 +1762,7 @@ export type Database = {
           sent_at?: string | null
           stream_id?: string | null
           streamer_id?: string | null
+          user_id?: string | null
           viewer_email?: string
         }
         Relationships: [
@@ -1669,39 +1784,59 @@ export type Database = {
       }
       streams: {
         Row: {
-          created_at: string | null
           description: string | null
           flag_count: number | null
+          host_id: string | null
           id: string
           is_hidden: boolean | null
           is_live: boolean | null
+          is_public: boolean | null
+          room_id: string | null
+          start_time: string | null
           stream_url: string
           title: string
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
-          created_at?: string | null
           description?: string | null
           flag_count?: number | null
+          host_id?: string | null
           id?: string
           is_hidden?: boolean | null
           is_live?: boolean | null
+          is_public?: boolean | null
+          room_id?: string | null
+          start_time?: string | null
           stream_url: string
           title: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
-          created_at?: string | null
           description?: string | null
           flag_count?: number | null
+          host_id?: string | null
           id?: string
           is_hidden?: boolean | null
           is_live?: boolean | null
+          is_public?: boolean | null
+          room_id?: string | null
+          start_time?: string | null
           stream_url?: string
           title?: string
           updated_at?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       strongs: {
         Row: {
@@ -1732,16 +1867,19 @@ export type Database = {
           created_at: string | null
           event_data: string | null
           id: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
           event_data?: string | null
           id?: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
           event_data?: string | null
           id?: number
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1753,6 +1891,7 @@ export type Database = {
           name: string
           price: number
           stripe_price_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1761,6 +1900,7 @@ export type Database = {
           name: string
           price: number
           stripe_price_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1769,6 +1909,7 @@ export type Database = {
           name?: string
           price?: number
           stripe_price_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -2058,6 +2199,7 @@ export type Database = {
           full_name: string | null
           id: string
           stripe_account_id: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -2065,6 +2207,7 @@ export type Database = {
           full_name?: string | null
           id: string
           stripe_account_id?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -2072,6 +2215,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           stripe_account_id?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
