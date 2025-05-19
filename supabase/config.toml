@@ -25,9 +25,11 @@ file_size_limit = "50MiB"
 
 [auth]
 site_url = "https://auth.biblenow.io"
-additional_redirect_urls = ["https://studio.biblenow.io/dashboard]
-additional_redirect_urls = ["http://localhost:4173]
-additional_redirect_urls = ["https://studio.biblenow.io/home]
+additional_redirect_urls = [
+  "https://studio.biblenow.io/dashboard",
+  "https://studio.biblenow.io/home",
+  "http://localhost:4173"
+]
                             
 cookie_options.domain = "biblenow.io"
 cookie_options.same_site = "lax"
