@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Loader, Mail, Lock, AlertTriangle } from 'lucide-react';
 import SocialSignIn from '@/components/auth/SocialSignIn';
+import PhoneSignInForm from '@/components/auth/PhoneSignInForm';
 
 interface SignInFormProps {
   onToggleForm: () => void;
@@ -16,6 +17,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPhoneSignIn, setIsPhoneSignIn] = useState(false);
   const { signIn, error, setError } = useAuth();
   const navigate = useNavigate();
 
@@ -33,6 +35,10 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       setIsSubmitting(false);
     }
   };
+
+  if (isPhoneSignIn) {
+    return <PhoneSignInForm onSwitchToEmail={() => setIsPhoneSignIn(false)} />;
+  }
 
   return (
     <div>
@@ -116,6 +122,16 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
           )}
         </Button>
       </form>
+
+      <div className="mt-4 text-center">
+        <button 
+          type="button" 
+          onClick={() => setIsPhoneSignIn(true)} 
+          className="text-sm auth-link"
+        >
+          Sign in with Phone Number
+        </button>
+      </div>
 
       <div className="mt-6">
         <div className="relative">
