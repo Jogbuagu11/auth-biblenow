@@ -24,8 +24,15 @@ pop3_port = 54326
 file_size_limit = "50MiB"
 
 [auth]
-site_url = "https://app.lovable.dev"
-additional_redirect_urls = ["https://localhost:3000"]
+site_url = "https://auth.biblenow.io"
+additional_redirect_urls = ["https://studio.biblenow.io/dashboard]
+additional_redirect_urls = ["http://localhost:4173]
+additional_redirect_urls = ["https://studio.biblenow.io/home]
+                            
+cookie_options.domain = "biblenow.io"
+cookie_options.same_site = "lax"
+cookie_options.secure = true
+    
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
@@ -56,3 +63,4 @@ serve_local_supabase = true
 
 [functions.link-firebase-user]
 verify_jwt = false
+
