@@ -60,6 +60,11 @@ enabled = false
 client_id = ""
 secret = ""
 
+  [auth.external.apple]
+enabled = true
+client_id = ""         
+secret = ""      
+
 [functions]
 serve_local_supabase = true
 
