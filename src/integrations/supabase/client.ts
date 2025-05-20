@@ -62,12 +62,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
         }
       },
     },
-    cookieOptions: {
-      domain: isLocalhost ? 'localhost' : '.biblenow.io',
-      path: '/',
-      sameSite: 'lax',
-      secure: !isLocalhost,
-      maxAge: 60 * 60 * 24 * 7 // 7 days
-    }
+    // Remove cookieOptions from here as it's not recognized in this context
   }
 });
