@@ -1170,12 +1170,14 @@ export type Database = {
           denomination: string | null
           donations_enabled: boolean | null
           email: string | null
+          facebook: string | null
           first_name: string | null
           full_name: string | null
           gender: string | null
           has_completed_2fa: boolean | null
           has_completed_profile: boolean | null
           id: string
+          instagram: string | null
           is_private: boolean | null
           is_verified: boolean | null
           last_name: string | null
@@ -1188,6 +1190,7 @@ export type Database = {
           profile_photo_url: string | null
           shekel_balance: number
           state: string | null
+          streaming_minutes: number | null
           stripe_account_id: string | null
           stripe_customer_id: string | null
           subscription_end_date: string | null
@@ -1195,9 +1198,12 @@ export type Database = {
           subscription_plan: string | null
           subscription_status: string | null
           subscription_tier: string | null
+          twitter: string | null
           updated_at: string | null
           username: string | null
+          website: string | null
           years_saved_category: string | null
+          youtube: string | null
         }
         Insert: {
           avatar?: string | null
@@ -1213,12 +1219,14 @@ export type Database = {
           denomination?: string | null
           donations_enabled?: boolean | null
           email?: string | null
+          facebook?: string | null
           first_name?: string | null
           full_name?: string | null
           gender?: string | null
           has_completed_2fa?: boolean | null
           has_completed_profile?: boolean | null
           id: string
+          instagram?: string | null
           is_private?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
@@ -1231,6 +1239,7 @@ export type Database = {
           profile_photo_url?: string | null
           shekel_balance?: number
           state?: string | null
+          streaming_minutes?: number | null
           stripe_account_id?: string | null
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
@@ -1238,9 +1247,12 @@ export type Database = {
           subscription_plan?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          twitter?: string | null
           updated_at?: string | null
           username?: string | null
+          website?: string | null
           years_saved_category?: string | null
+          youtube?: string | null
         }
         Update: {
           avatar?: string | null
@@ -1256,12 +1268,14 @@ export type Database = {
           denomination?: string | null
           donations_enabled?: boolean | null
           email?: string | null
+          facebook?: string | null
           first_name?: string | null
           full_name?: string | null
           gender?: string | null
           has_completed_2fa?: boolean | null
           has_completed_profile?: boolean | null
           id?: string
+          instagram?: string | null
           is_private?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
@@ -1274,6 +1288,7 @@ export type Database = {
           profile_photo_url?: string | null
           shekel_balance?: number
           state?: string | null
+          streaming_minutes?: number | null
           stripe_account_id?: string | null
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
@@ -1281,9 +1296,12 @@ export type Database = {
           subscription_plan?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          twitter?: string | null
           updated_at?: string | null
           username?: string | null
+          website?: string | null
           years_saved_category?: string | null
+          youtube?: string | null
         }
         Relationships: []
       }
