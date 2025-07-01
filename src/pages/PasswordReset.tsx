@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AuthLayout from '@/components/AuthLayout';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +44,7 @@ const PasswordReset: React.FC = () => {
         toast.error('Password reset failed', { description: error.message });
       } else {
         toast.success('Password updated', { description: 'Your password has been successfully reset.' });
-        setTimeout(() => navigate('/login'), 2000);
+        setTimeout(() => navigate('/'), 2000);
       }
     } catch (error: any) {
       toast.error('An unexpected error occurred', { description: error.message });
@@ -116,7 +115,7 @@ const PasswordReset: React.FC = () => {
           
           <p className="text-center text-sm text-biblenow-beige/60">
             Remember your password?{' '}
-            <button type="button" onClick={() => navigate('/login')} className="auth-link">
+            <button type="button" onClick={() => navigate('/')} className="auth-link">
               Back to Login
             </button>
           </p>
