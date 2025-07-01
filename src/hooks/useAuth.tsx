@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -109,7 +108,7 @@ export const useAuth = () => {
         password,
         options: {
           data: metadata || {},
-          emailRedirectTo: 'https://social.biblenow.io/edit-testimony'
+          emailRedirectTo: 'https://studio.biblenow.io/dashboard'
         },
       });
       

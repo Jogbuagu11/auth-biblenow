@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,6 +53,10 @@ const CallbackHandler = () => {
           console.log("Redirecting to:", decodeURIComponent(redirectTo));
           window.location.href = decodeURIComponent(redirectTo);
           return;
+        } else {
+          // Navigate to the home page if no redirect is specified
+          console.log("No redirect specified, going to default location");
+          window.location.href = 'https://studio.biblenow.io/dashboard';
         }
         
         // Check if 2FA has been enabled or skipped in user metadata
@@ -69,8 +72,8 @@ const CallbackHandler = () => {
         // Determine if this is a new user that needs to complete profile
         const needsProfileSetup = !profileData?.has_completed_profile;
         
-        // Redirect to social.biblenow.io to complete profile setup
-        window.location.href = 'https://social.biblenow.io/edit-testimony';
+        // Redirect to studio.biblenow.io dashboard
+        window.location.href = 'https://studio.biblenow.io/dashboard';
       } catch (error: any) {
         console.error('Error handling auth callback:', error.message);
         setError(error.message);

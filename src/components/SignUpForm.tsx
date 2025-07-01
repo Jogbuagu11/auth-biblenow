@@ -62,7 +62,7 @@ const SignUpForm: React.FC = () => {
           gender,
           birthdate: format(birthdate, 'yyyy-MM-dd'),
         },
-        emailRedirectTo: 'https://social.biblenow.io/edit-testimony',
+        emailRedirectTo: 'https://studio.biblenow.io/dashboard',
       }
     });
 
@@ -73,7 +73,7 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    navigate('/check-email');
+    window.location.href = 'https://studio.biblenow.io/dashboard';
   };
 
   return (

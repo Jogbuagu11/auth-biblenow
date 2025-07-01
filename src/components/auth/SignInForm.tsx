@@ -55,7 +55,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
         toast.error('Login failed', { description: error.message });
       } else {
         toast.success('Welcome back!', { description: 'Signed in successfully.' });
-        navigate('/edit-testimony');
+        window.location.href = 'https://studio.biblenow.io/dashboard';
       }
     } catch (error: any) {
       toast.error('An unexpected error occurred', { description: error.message });
@@ -107,7 +107,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
         toast.error('OTP verification failed', { description: error.message });
       } else {
         toast.success('Verified successfully!');
-        navigate('/edit-testimony');
+        window.location.href = 'https://studio.biblenow.io/dashboard';
       }
     } catch (error: any) {
       toast.error('An unexpected error occurred', { description: error.message });

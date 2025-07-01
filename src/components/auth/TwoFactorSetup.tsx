@@ -59,7 +59,7 @@ const TwoFactorSetup: React.FC = () => {
     }
 
     toast({ title: 'Success', description: 'Two-Factor Authentication enabled.' });
-    navigate('/edit-testimony');
+    window.location.href = 'https://studio.biblenow.io/dashboard';
   };
 
   return (
