@@ -33,9 +33,6 @@ const AuthCallback = () => {
         }
         
         // Otherwise, proceed with normal redirect
-<<<<<<< HEAD
-        window.location.href = redirectTo || 'https://studio.biblenow.io/dashboard';
-=======
         window.location.href = redirectTo || 'https://auth.biblenow.io/email-confirmed';
 >>>>>>> aca665a6d7e0d5ca03f7d806fb987e78b3c9155a
       } else {
