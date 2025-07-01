@@ -12,18 +12,32 @@ const AuthCallback = () => {
       const redirectTo = new URLSearchParams(window.location.search).get('redirectTo');
 
       if (data.session) {
+        // Check if this is the user's first login
+        const isFirstLogin = data.session.user?.user_metadata?.is_first_login;
+        
         // Check if 2FA has been enabled or skipped
         const twoFaEnabled = data.session.user?.user_metadata?.twofa_enabled;
         const twoFaSkipped = data.session.user?.user_metadata?.twofa_skipped;
         
-        // If 2FA hasn't been set up or skipped, redirect to 2FA prompt
-        if (!twoFaEnabled && !twoFaSkipped) {
+        // If this is first login and 2FA hasn't been set up or skipped, redirect to 2FA prompt
+        if (isFirstLogin && !twoFaEnabled && !twoFaSkipped) {
           navigate('/auth/two-factor-prompt');
           return;
         }
         
+        // If this is first login, update the metadata to mark it as not first login anymore
+        if (isFirstLogin) {
+          await supabase.auth.updateUser({
+            data: { is_first_login: false }
+          });
+        }
+        
         // Otherwise, proceed with normal redirect
+<<<<<<< HEAD
         window.location.href = redirectTo || 'https://studio.biblenow.io/dashboard';
+=======
+        window.location.href = redirectTo || 'https://auth.biblenow.io/email-confirmed';
+>>>>>>> aca665a6d7e0d5ca03f7d806fb987e78b3c9155a
       } else {
         navigate('/auth'); // fallback if session fails
       }
