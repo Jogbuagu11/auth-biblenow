@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,8 +64,8 @@ const CallbackHandler = () => {
         // Determine if this is a new user that needs to complete profile
         const needsProfileSetup = !profileData?.has_completed_profile;
         
-        // Redirect to social.biblenow.io to complete profile setup
-        window.location.href = 'https://social.biblenow.io/edit-testimony';
+        // Redirect to email confirmed page
+        window.location.href = `${window.location.origin}/email-confirmed`;
       } catch (error: any) {
         console.error('Error handling auth callback:', error.message);
         setError(error.message);
@@ -86,7 +85,7 @@ const CallbackHandler = () => {
           <h1 className="text-2xl font-serif font-semibold text-biblenow-beige mb-4">Authentication Error</h1>
           <p className="text-biblenow-beige/60 mb-6">{error}</p>
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/')}
             className="auth-btn-primary w-full"
           >
             Return to Login

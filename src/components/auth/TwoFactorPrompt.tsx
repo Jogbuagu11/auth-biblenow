@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -30,8 +29,8 @@ const TwoFactorPrompt: React.FC = () => {
         description: 'You can enable 2FA anytime in your account settings'
       });
       
-      // Redirect to edit testimony page
-      window.location.href = 'https://social.biblenow.io/edit-testimony';
+      // Redirect to studio dashboard
+      window.location.href = 'https://studio.biblenow.io/dashboard';
     } catch (err: any) {
       toast.error('An error occurred', {
         description: err.message

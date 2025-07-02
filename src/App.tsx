@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,8 +18,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Auth />} />
+          <Route path="/" element={<Auth />} />
           <Route path="/auth/callback" element={<CallbackHandler />} />
           <Route path="/auth/two-factor-prompt" element={<TwoFactorPrompt />} />
           <Route path="/auth/setup-2fa" element={<TwoFactorSetup />} />

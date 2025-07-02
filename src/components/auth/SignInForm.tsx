@@ -26,8 +26,8 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
     if (error) {
       toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Welcome back!', description: 'Signed in successfully.' });
-      navigate('/edit-testimony');
+      toast.success('Welcome back!', { description: 'Signed in successfully.' });
+      window.location.href = 'https://studio.biblenow.io/dashboard';
     }
 
     setLoading(false);

@@ -41,7 +41,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
       description: 'Welcome back!',
     });
 
-    navigate('/edit-testimony');
+    window.location.href = 'https://studio.biblenow.io/dashboard';
   };
 
   return (

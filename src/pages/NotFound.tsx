@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,7 +7,7 @@ const NotFound = () => {
   useEffect(() => {
     // Redirect to login page after a short delay
     const timer = setTimeout(() => {
-      navigate('/login');
+      navigate('/');
     }, 3000);
     
     return () => clearTimeout(timer);
@@ -23,7 +22,7 @@ const NotFound = () => {
           The page you're looking for doesn't exist. You'll be redirected to the login page shortly.
         </p>
         <button
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/')}
           className="auth-btn-primary w-full"
         >
           Go to Login

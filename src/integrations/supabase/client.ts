@@ -2,8 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://jhlawjmyorpmafokxtuh.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpobGF3am15b3JwbWFmb2t4dHVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MzI5MjYsImV4cCI6MjA1ODUwODkyNn0.qwGsvKP5P2kwMT9qkEA0ZxjAVUM-RIf9Do9xiPMikX4";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY!;
 
 // Cookie domain should be .biblenow.io in production
 // This allows auth sharing across subdomains (auth.biblenow.io and social.biblenow.io)
@@ -18,7 +18,9 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    // Important: For cookie-based auth across subdomains, use cookie storage
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    debug: true,
     storage: {
       getItem: (key) => document.cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() || '',
       setItem: (key, value) => {
@@ -28,12 +30,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
         document.cookie = `${key}=; domain=${cookieDomain}; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; secure`;
       },
     },
-    detectSessionInUrl: true,
-    flowType: 'pkce', // Use PKCE flow for better security
-    autoRefreshToken: true, // Automatically refresh tokens
-    debug: true, // Enable debug mode for troubleshooting
   },
-  // Add global error handling for Edge Functions
   global: {
     headers: {
       'Content-Type': 'application/json',
