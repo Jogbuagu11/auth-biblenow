@@ -108,7 +108,7 @@ export const useAuth = () => {
         password,
         options: {
           data: metadata || {},
-          emailRedirectTo: 'https://studio.biblenow.io/dashboard'
+          emailRedirectTo: `${window.location.origin}/email-confirmed`
         },
       });
       

@@ -32,8 +32,7 @@ const AuthCallback = () => {
           });
         }
         
-        window.location.href = redirectTo || 'https://auth.biblenow.io/email-confirmed';
->>>>>>> aca665a6d7e0d5ca03f7d806fb987e78b3c9155a
+        window.location.href = redirectTo || `${window.location.origin}/email-confirmed`;
       } else {
         navigate('/auth'); // fallback if session fails
       }

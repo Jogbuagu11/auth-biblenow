@@ -54,9 +54,9 @@ const CallbackHandler = () => {
           window.location.href = decodeURIComponent(redirectTo);
           return;
         } else {
-          // Navigate to the home page if no redirect is specified
-          console.log("No redirect specified, going to default location");
-          window.location.href = 'https://studio.biblenow.io/dashboard';
+          // Navigate to the email confirmed page if no redirect is specified
+          console.log("No redirect specified, going to email confirmed page");
+          window.location.href = `${window.location.origin}/email-confirmed`;
         }
         
         // Check if 2FA has been enabled or skipped in user metadata
