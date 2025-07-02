@@ -2,8 +2,23 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY!;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Debug logging to help identify environment variable issues
+console.log('Environment variables check:', {
+  SUPABASE_URL: SUPABASE_URL ? 'Set' : 'Missing',
+  SUPABASE_PUBLISHABLE_KEY: SUPABASE_PUBLISHABLE_KEY ? 'Set' : 'Missing',
+  env: import.meta.env
+});
+
+if (!SUPABASE_URL) {
+  throw new Error('VITE_SUPABASE_URL environment variable is required but not set');
+}
+
+if (!SUPABASE_PUBLISHABLE_KEY) {
+  throw new Error('VITE_SUPABASE_ANON_KEY environment variable is required but not set');
+}
 
 // Cookie domain should be .biblenow.io in production
 // This allows auth sharing across subdomains (auth.biblenow.io and social.biblenow.io)
