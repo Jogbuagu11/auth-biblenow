@@ -35,9 +35,11 @@ export type Database = {
       }
       auth_signups: {
         Row: {
+          birthdate: string | null
           country: string | null
           device_type: string | null
           email: string | null
+          gender: string | null
           id: string
           ip_address: string | null
           referral_source: string | null
@@ -46,9 +48,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          birthdate?: string | null
           country?: string | null
           device_type?: string | null
           email?: string | null
+          gender?: string | null
           id?: string
           ip_address?: string | null
           referral_source?: string | null
@@ -57,9 +61,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          birthdate?: string | null
           country?: string | null
           device_type?: string | null
           email?: string | null
+          gender?: string | null
           id?: string
           ip_address?: string | null
           referral_source?: string | null
