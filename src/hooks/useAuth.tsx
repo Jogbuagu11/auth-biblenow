@@ -119,6 +119,34 @@ export const useAuth = () => {
         return false;
       }
       
+      // Manually insert signup data into auth_signups table
+      if (data.user) {
+        try {
+          const { error: insertError } = await supabase
+            .from('auth_signups')
+            .insert({
+              user_id: data.user.id,
+              email: email,
+              birthdate: metadata?.birthdate || null,
+              gender: metadata?.gender || null,
+              signup_time: new Date().toISOString(),
+              ip_address: null, // Could be populated from request headers
+              user_agent: navigator.userAgent,
+              device_type: /Mobile|Android|iPhone|iPad/.test(navigator.userAgent) ? 'mobile' : 'desktop',
+              country: null, // Could be populated from IP geolocation
+              referral_source: null // Could be populated from URL parameters
+            });
+
+          if (insertError) {
+            console.warn("Failed to insert auth_signups data:", insertError);
+            // Don't fail the signup process if this fails
+          }
+        } catch (insertError) {
+          console.warn("Error inserting auth_signups data:", insertError);
+          // Don't fail the signup process if this fails
+        }
+      }
+      
       toast('Account created', {
         description: 'Please check your email to confirm your account',
       });
