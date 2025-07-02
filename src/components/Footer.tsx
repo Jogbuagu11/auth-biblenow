@@ -12,7 +12,7 @@ const Footer = () => {
           {/* Column 1 - Logo */}
           <div className="space-y-4">
             <img 
-              src="/lovable-uploads/0fb57340-3877-426f-9098-3a62d10a1114.png" 
+              src="/favicon.png" 
               alt="BibleNOW Logo" 
               className="h-16 mb-4"
             />

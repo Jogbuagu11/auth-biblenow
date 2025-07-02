@@ -15,4 +15,4 @@ const EmailConfirmed: React.FC = () => (
   </div>
 );
 
-export default EmailConfirmed; 
+export default EmailConfirmed;

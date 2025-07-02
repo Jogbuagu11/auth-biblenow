@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -11,46 +11,33 @@ const CallbackHandler = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the auth code from the URL
-        const code = searchParams.get('code');
+        // Get the session after the OAuth callback
+        const { data, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        if (!data.session) {
+          throw new Error('No session found after authentication');
+        }
+
+        // Get redirect parameters from URL
         const redirectTo = searchParams.get('redirectTo');
+        const next = searchParams.get('next');
+        const returnTo = searchParams.get('returnTo');
         
-        if (!code) {
-          throw new Error('No code provided in callback URL');
-        }
+        // Determine the redirect URL with priority order
+        let finalRedirectUrl = null;
         
-        console.log("Auth callback received with code, exchanging for session...");
-        
-        // Exchange the code for a session
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-        
-        console.log("Exchange code response:", { data, error });
-        
-        if (error) {
-          console.error("Error exchanging code for session:", error);
-          throw error;
-        }
-        
-        // Check if the user has completed their profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('has_completed_profile')
-          .eq('id', data.session.user.id)
-          .single();
-          
-        console.log("Profile data:", profileData);
-        
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error("Error fetching profile:", profileError);
-        }
-        
-        // Handle redirect if specified in the URL
         if (redirectTo) {
-          console.log("Redirecting to:", decodeURIComponent(redirectTo));
-          window.location.href = decodeURIComponent(redirectTo);
-          return;
+          finalRedirectUrl = decodeURIComponent(redirectTo);
+        } else if (next) {
+          finalRedirectUrl = decodeURIComponent(next);
+        } else if (returnTo) {
+          finalRedirectUrl = decodeURIComponent(returnTo);
         }
-        
+
         // Check if 2FA has been enabled or skipped in user metadata
         const twoFaEnabled = data.session.user.user_metadata?.twofa_enabled;
         const twoFaSkipped = data.session.user.user_metadata?.twofa_skipped;
@@ -60,12 +47,18 @@ const CallbackHandler = () => {
           navigate('/auth/two-factor-prompt');
           return;
         }
-        
-        // Determine if this is a new user that needs to complete profile
-        const needsProfileSetup = !profileData?.has_completed_profile;
-        
-        // Redirect to email confirmed page
+
+        // If we have a specific redirect URL, use it
+        if (finalRedirectUrl) {
+          console.log("Redirecting to:", finalRedirectUrl);
+          window.location.href = finalRedirectUrl;
+          return;
+        }
+
+        // Default fallback - redirect to email confirmed page
+        console.log("No specific redirect, going to email confirmed page");
         window.location.href = `${window.location.origin}/email-confirmed`;
+        
       } catch (error: any) {
         console.error('Error handling auth callback:', error.message);
         setError(error.message);

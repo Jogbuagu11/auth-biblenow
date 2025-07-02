@@ -36,6 +36,17 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
 
     const birthdate = new Date(birthDateString)
 
+    // Get redirect URL from URL parameters for different subdomains
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTo = urlParams.get('redirectTo') || urlParams.get('next') || urlParams.get('returnTo');
+    
+    // Determine the email redirect URL
+    let emailRedirectUrl = `${window.location.origin}/email-confirmed`;
+    if (redirectTo) {
+      // Add the redirect parameter to the email confirmation URL
+      emailRedirectUrl = `${window.location.origin}/email-confirmed?redirectTo=${encodeURIComponent(redirectTo)}`;
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -47,7 +58,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
           gender,
           birthdate: format(birthdate, 'yyyy-MM-dd'),
         },
-        emailRedirectTo: `${window.location.origin}/email-confirmed`
+        emailRedirectTo: emailRedirectUrl
       }
     })
 
@@ -90,8 +101,41 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
     captchaRef.current?.resetCaptcha()
   }
 
+  const handleSocialSignUp = async (provider: "google" | "apple") => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log("Redirecting to OAuth provider:", data);
+    } catch (error: any) {
+      toast.error(`Social sign-up failed`, {
+        description: error.message || "Could not connect to authentication provider"
+      });
+      setLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   return (
-    <form onSubmit={handleSignUp} className="space-y-6">
+    <form onSubmit={handleSignUp} className="space-y-4">
+      {error && <div className="text-red-600 text-sm">{error}</div>}
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm text-biblenow-beige mb-1 block">First Name</label>
@@ -138,6 +182,32 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
       </div>
 
       <Button type="submit" className="w-full auth-btn-primary">Create Account</Button>
+
+      <div className="flex items-center my-4">
+        <div className="flex-grow h-px bg-biblenow-beige/20"></div>
+        <span className="mx-2 text-xs text-biblenow-beige/60">or continue with</span>
+        <div className="flex-grow h-px bg-biblenow-beige/20"></div>
+      </div>
+      <div className="flex space-x-2 mb-1">
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex-1 flex items-center justify-center gap-2"
+          onClick={() => handleSocialSignUp("google")}
+          disabled={loading}
+        >
+          <GoogleIcon /> Google
+        </Button>
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex-1 flex items-center justify-center gap-2"
+          onClick={() => handleSocialSignUp("apple")}
+          disabled={loading}
+        >
+          <AppleIcon /> Apple
+        </Button>
+      </div>
 
       <p className="text-center text-sm text-biblenow-beige/60 mt-4">
         Already have an account?{' '}

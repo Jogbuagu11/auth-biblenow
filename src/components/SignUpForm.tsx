@@ -62,7 +62,11 @@ const SignUpForm: React.FC = () => {
           gender,
           birthdate: format(birthdate, 'yyyy-MM-dd'),
         },
+<<<<<<< HEAD
         emailRedirectTo: `${window.location.origin}/email-confirmed`,
+=======
+        emailRedirectTo: 'https://studio.biblenow.io/dashboard',
+>>>>>>> cb08dfdac9c038253e4f42b3f148edd71c410106
       }
     });
 
@@ -73,6 +77,7 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
+<<<<<<< HEAD
     // Manually insert signup data into auth_signups table
     try {
       const { data: userData } = await supabase.auth.getUser();
@@ -103,6 +108,9 @@ const SignUpForm: React.FC = () => {
     }
 
     navigate('/check-email');
+=======
+    window.location.href = 'https://studio.biblenow.io/dashboard';
+>>>>>>> cb08dfdac9c038253e4f42b3f148edd71c410106
   };
 
   return (
