@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getRedirectUrlFromParams, safeRedirect } from '@/utils/redirectUtils';
 
 const CallbackHandler = () => {
   const [searchParams] = useSearchParams();
@@ -22,21 +23,8 @@ const CallbackHandler = () => {
           throw new Error('No session found after authentication');
         }
 
-        // Get redirect parameters from URL
-        const redirectTo = searchParams.get('redirectTo');
-        const next = searchParams.get('next');
-        const returnTo = searchParams.get('returnTo');
-        
-        // Determine the redirect URL with priority order
-        let finalRedirectUrl = null;
-        
-        if (redirectTo) {
-          finalRedirectUrl = decodeURIComponent(redirectTo);
-        } else if (next) {
-          finalRedirectUrl = decodeURIComponent(next);
-        } else if (returnTo) {
-          finalRedirectUrl = decodeURIComponent(returnTo);
-        }
+        // Get redirect URL using centralized utility
+        const redirectUrl = getRedirectUrlFromParams(searchParams);
 
         // Check if 2FA has been enabled or skipped in user metadata
         const twoFaEnabled = data.session.user.user_metadata?.twofa_enabled;
@@ -48,16 +36,8 @@ const CallbackHandler = () => {
           return;
         }
 
-        // If we have a specific redirect URL, use it
-        if (finalRedirectUrl) {
-          console.log("Redirecting to:", finalRedirectUrl);
-          window.location.href = finalRedirectUrl;
-          return;
-        }
-
-        // Default fallback - redirect to email confirmed page
-        console.log("No specific redirect, going to email confirmed page");
-        window.location.href = `${window.location.origin}/email-confirmed`;
+        // Use centralized redirect utility
+        safeRedirect(redirectUrl);
         
       } catch (error: any) {
         console.error('Error handling auth callback:', error.message);

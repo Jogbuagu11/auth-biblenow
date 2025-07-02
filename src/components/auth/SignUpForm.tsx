@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useToast } from '@/components/ui/use-toast'
 import { format } from 'date-fns'
+import { getCurrentRedirectUrl, buildEmailRedirectUrl } from '@/utils/redirectUtils'
 
 interface SignUpFormProps {
   onToggleForm: () => void
@@ -36,16 +37,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleForm }) => {
 
     const birthdate = new Date(birthDateString)
 
-    // Get redirect URL from URL parameters for different subdomains
-    const urlParams = new URLSearchParams(window.location.search);
-    const redirectTo = urlParams.get('redirectTo') || urlParams.get('next') || urlParams.get('returnTo');
+    // Get redirect URL using centralized utility
+    const redirectUrl = getCurrentRedirectUrl();
     
-    // Determine the email redirect URL
-    let emailRedirectUrl = `${window.location.origin}/email-confirmed`;
-    if (redirectTo) {
-      // Add the redirect parameter to the email confirmation URL
-      emailRedirectUrl = `${window.location.origin}/email-confirmed?redirectTo=${encodeURIComponent(redirectTo)}`;
-    }
+    // Build email redirect URL using centralized utility
+    const emailRedirectUrl = buildEmailRedirectUrl(`${window.location.origin}/email-confirmed`, redirectUrl);
 
     const { data, error } = await supabase.auth.signUp({
       email,
