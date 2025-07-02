@@ -41,13 +41,6 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
         return;
       }
 
-<<<<<<< HEAD
-    if (error) {
-      toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
-    } else {
-      toast.success('Welcome back!', { description: 'Signed in successfully.' });
-      window.location.href = 'https://studio.biblenow.io/dashboard';
-=======
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -77,7 +70,6 @@ const SignInForm: React.FC<SignInFormProps> = ({ onToggleForm }) => {
     if (!phone) {
       toast.error('Phone number is required');
       return;
->>>>>>> cb08dfdac9c038253e4f42b3f148edd71c410106
     }
 
     setLoading(true);

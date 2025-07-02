@@ -25,9 +25,6 @@ const AuthCallback = () => {
           return;
         }
         
-<<<<<<< HEAD
-        // Otherwise, proceed with normal redirect
-=======
         // If this is first login, update the metadata to mark it as not first login anymore
         if (isFirstLogin) {
           await supabase.auth.updateUser({
@@ -35,7 +32,6 @@ const AuthCallback = () => {
           });
         }
         
->>>>>>> cb08dfdac9c038253e4f42b3f148edd71c410106
         window.location.href = redirectTo || `${window.location.origin}/email-confirmed`;
       } else {
         navigate('/auth'); // fallback if session fails
